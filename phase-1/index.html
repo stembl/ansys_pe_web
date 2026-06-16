@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="ANSYS product landscape, Workbench project structure, file types, and archive format. Phase 1 of the ANSYS for Mechanical Engineers training.">
+  <link rel="canonical" href="https://stembl.github.io/ansys_pe_web/phase-1/">
+  <title>Phase 1: Orientation — ANSYS for Mechanical Engineers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <header class="site-header" role="banner">
+    <div class="container">
+      <a href="../" class="site-logo">ANSYS Training</a>
+      <span class="version-pill">2025 R2</span>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+
+    <!-- Sidebar navigation -->
+    <nav class="sidebar" aria-label="Course navigation">
+      <span class="sidebar-label">Phases</span>
+      <ol class="nav-phases">
+        <li class="nav-phase is-active">
+          <a href="../phase-1/">1 &mdash; Orientation</a>
+          <ol class="nav-sub" aria-label="Topics in Phase 1">
+            <li><a href="#product-landscape">1.1 Product landscape</a></li>
+            <li><a href="#workbench-structure">1.2 Workbench structure</a></li>
+            <li><a href="#file-types">1.3 File types &amp; archive</a></li>
+          </ol>
+        </li>
+        <li class="nav-phase"><span>2 &mdash; SpaceClaim</span></li>
+        <li class="nav-phase"><span>3 &mdash; Meshing</span></li>
+        <li class="nav-phase"><span>4 &mdash; Structural &amp; Thermal</span></li>
+        <li class="nav-phase"><span>5 &mdash; Icepak</span></li>
+        <li class="nav-phase"><span>6 &mdash; Maxwell</span></li>
+        <li class="nav-phase"><span>7 &mdash; Multi-Physics</span></li>
+      </ol>
+    </nav>
+
+    <!-- Main content -->
+    <main class="content-main" id="main-content">
+
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../">Home</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <span aria-current="page">Phase 1</span>
+      </nav>
+
+      <header class="phase-header">
+        <span class="phase-label">Phase 1</span>
+        <h1>Orientation</h1>
+        <p class="phase-intro">
+          Before running any simulation, two questions need answers: which tool to open,
+          and how to keep the project organized. This phase covers the ANSYS product family,
+          how Workbench connects those tools, and the file structure you will work with throughout
+          every subsequent phase.
+        </p>
+      </header>
+
+      <!-- 1.1 Product Landscape -->
+      <section class="topic" id="product-landscape">
+        <h2>1.1 &nbsp;ANSYS Product Landscape</h2>
+
+        <p>
+          ANSYS groups its simulation tools by physics domain. For mechanical engineers working
+          on power electronics products, four tools cover the essential work:
+        </p>
+
+        <dl>
+          <dt>ANSYS SpaceClaim</dt>
+          <dd>
+            The geometry preparation environment. Every analysis in this walkthrough starts here.
+            SpaceClaim imports geometry from any major CAD source, provides tools to simplify and
+            repair it for simulation, and connects directly to the Workbench project.<sup class="cite">[1]</sup>
+          </dd>
+
+          <dt>ANSYS Workbench</dt>
+          <dd>
+            The integration framework. Workbench does not run analyses itself — it connects analysis
+            systems, manages data flow between them, and tracks what needs to be updated when an input
+            changes. Think of it as the project coordinator.<sup class="cite">[2]</sup>
+          </dd>
+
+          <dt>ANSYS Mechanical</dt>
+          <dd>
+            The finite element analysis (FEA) solver for structural and thermal problems: static
+            stress, modal analysis, random vibration, steady-state thermal, and coupled thermal-structural
+            analyses.<sup class="cite">[3]</sup>
+          </dd>
+
+          <dt>ANSYS Icepak</dt>
+          <dd>
+            The thermal computational fluid dynamics (CFD) solver. Icepak computes fluid flow and heat
+            transfer simultaneously — it is the right tool when airflow path, flow rate, or enclosure
+            geometry affects the thermal result.<sup class="cite">[4]</sup>
+          </dd>
+
+          <dt>ANSYS Maxwell</dt>
+          <dd>
+            The electromagnetic finite element solver. Three solver types cover the range: magnetostatic
+            for DC field and force problems, eddy current for AC losses at a single frequency, and
+            transient for time-varying field solutions.<sup class="cite">[5]</sup>
+          </dd>
+        </dl>
+
+        <p>
+          A standard workflow moves in one direction: CAD &rarr; SpaceClaim &rarr; Workbench &rarr;
+          solver &rarr; results. Multi-physics workflows link solvers within Workbench, passing output
+          from one (Maxwell electromagnetic losses) as input to the next (Icepak heat sources).
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 1.1">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Workbench connects tools — it does not run the analysis. Each solver opens into its
+                own environment from the Workbench schematic.</li>
+            <li>SpaceClaim is upstream of everything. A geometry problem becomes a mesh problem,
+                which becomes a solver problem. Fix it at the source.</li>
+            <li>The tools are licensed separately. Confirm which licenses are available before
+                planning an analysis chain.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <!-- 1.2 Workbench Structure -->
+      <section class="topic" id="workbench-structure">
+        <h2>1.2 &nbsp;Workbench Project Structure</h2>
+
+        <p>
+          The Workbench project schematic is a visual map of the analysis chain. Each block is a
+          component system. Each system contains cells — Geometry, Mesh, Setup, Solution, Results —
+          representing sequential steps in that analysis.
+        </p>
+
+        <h3>Linked systems</h3>
+        <p>
+          When two systems are linked, they share one or more cells. The most common link connects
+          a Static Structural system to a Steady-State Thermal system, sharing geometry and mesh
+          between them. A change to the geometry propagates automatically to both analyses.
+        </p>
+        <p>
+          Sharing a mesh cell means the thermal analysis and the structural analysis use the same
+          mesh. This is efficient, but it means mesh decisions are shared — refining the mesh for
+          thermal accuracy also refines it for the structural analysis. Plan the mesh for the more
+          demanding of the two analyses.
+        </p>
+
+        <h3>Cell state indicators</h3>
+        <p>
+          Each cell displays a state indicator. Reading these indicators correctly prevents acting
+          on stale results:
+        </p>
+        <ul>
+          <li><strong>Up to date</strong> — the cell's output matches its current inputs.</li>
+          <li><strong>Needs update</strong> (lightning bolt) — an upstream input changed; the result
+              is not current. Do not interpret results in this state.</li>
+          <li><strong>Incomplete</strong> — the cell setup is not finished; the analysis cannot run.</li>
+          <li><strong>Refresh required</strong> — an external file (geometry, material) changed on disk.</li>
+        </ul>
+        <p>
+          Update from the top of the dependency chain, not from the bottom. Updating the Results
+          cell before updating Mesh gives you results on a stale mesh.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 1.2">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>A lightning bolt on any cell means that cell's output is not current. Trace back to
+                the changed input before re-running.</li>
+            <li>Linked systems share cells — mesh quality decisions affect all analyses on that mesh.</li>
+            <li>Right-click a system in the schematic &rarr; <em>Update</em> to update that system
+                and all systems it feeds.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <!-- 1.3 File Types -->
+      <section class="topic" id="file-types">
+        <h2>1.3 &nbsp;File Types and Project Organization</h2>
+
+        <h3>Workbench project structure on disk</h3>
+        <p>
+          A Workbench project consists of two parts that must remain together:
+        </p>
+        <ul>
+          <li>
+            <code>ProjectName.wbpj</code> — the project file. Contains project metadata only.
+            Small, text-based. Opening this file without its accompanying directory opens an empty project.
+          </li>
+          <li>
+            <code>ProjectName_files/</code> — the project data directory. Contains all geometry,
+            mesh, solver input files, and result files. This is what makes a project large.
+          </li>
+        </ul>
+        <p>
+          Moving or sharing a project means moving both. A common mistake is archiving only the
+          <code>.wbpj</code> file and losing all project data.
+        </p>
+
+        <h3>File types by tool</h3>
+        <table class="data-table" aria-label="ANSYS file types by tool">
+          <thead>
+            <tr>
+              <th scope="col">Extension</th>
+              <th scope="col">Tool</th>
+              <th scope="col">Contains</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code>.wbpj</code></td>
+              <td>Workbench</td>
+              <td>Project metadata. Requires <code>_files/</code> directory to be useful.</td>
+            </tr>
+            <tr>
+              <td><code>.mechdat</code></td>
+              <td>Mechanical</td>
+              <td>Full Mechanical setup and results. Can be opened independently of Workbench.</td>
+            </tr>
+            <tr>
+              <td><code>.agdb</code></td>
+              <td>SpaceClaim / DesignModeler</td>
+              <td>ANSYS native geometry database.</td>
+            </tr>
+            <tr>
+              <td><code>.aedt</code></td>
+              <td>Maxwell</td>
+              <td>Complete Maxwell project — geometry, mesh, setup, and results. Self-contained.</td>
+            </tr>
+            <tr>
+              <td><code>.stp</code> / <code>.step</code></td>
+              <td>Any (import)</td>
+              <td>STEP — neutral CAD format. Most reliable for import from any CAD source.</td>
+            </tr>
+            <tr>
+              <td><code>.igs</code> / <code>.iges</code></td>
+              <td>Any (import)</td>
+              <td>IGES — older neutral format. Use STEP when available.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Archive format</h3>
+        <p>
+          Workbench includes a built-in archive function: <code>File &rarr; Archive</code>.
+          This creates a <code>.wbpz</code> file — a compressed ZIP archive of the entire project.
+        </p>
+        <p>
+          The archive dialog asks whether to include result files. This choice has a meaningful
+          impact on archive size:
+        </p>
+        <ul>
+          <li>
+            A Mechanical result file for a moderately complex model is typically
+            200 MB to 2 GB.
+          </li>
+          <li>
+            An Icepak result set for a full-enclosure CFD model is typically 500 MB to 5 GB.
+          </li>
+          <li>
+            A Maxwell <code>.aedt</code> result set is typically smaller — 50 to 500 MB —
+            because the mesh is sparser than a Mechanical mesh for comparable geometry.
+          </li>
+        </ul>
+
+        <h3>When to include results</h3>
+        <p>
+          Include results in the archive when:
+        </p>
+        <ul>
+          <li>The solve takes more than 30 minutes and will not be re-run for the archive's purpose.</li>
+          <li>Archiving at a project milestone for record-keeping — the result is part of the record.</li>
+          <li>Sharing with someone who cannot re-run the analysis (no license, different hardware).</li>
+        </ul>
+        <p>
+          Exclude results when:
+        </p>
+        <ul>
+          <li>Sharing the setup for a colleague to solve independently.</li>
+          <li>The result can be regenerated in under 30 minutes from the saved setup.</li>
+          <li>Disk space or transfer bandwidth is constrained.</li>
+        </ul>
+
+        <p>
+          For Maxwell projects, the archive is <code>File &rarr; Save As &rarr; .aedtz</code>
+          (compressed Maxwell archive). To exclude results before archiving:
+          <code>Tools &rarr; Clean Up Project</code> removes result data from the <code>.aedt</code>
+          before saving the archive.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 1.3">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Never move the <code>.wbpj</code> without the <code>_files/</code> directory.
+                They are one project.</li>
+            <li>Both <code>.wbpz</code> and <code>.aedtz</code> are standard ZIP files —
+                they can be inspected with any ZIP utility if the project needs to be recovered
+                manually.</li>
+            <li>Name archives to indicate whether results are included:
+                <code>MotorMount_setup.wbpz</code> vs. <code>MotorMount_with_results.wbpz</code>.
+                The distinction matters when the archive is retrieved months later.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <!-- References -->
+      <section class="references" aria-label="References">
+        <h2>References</h2>
+        <ol>
+          <li id="ref-1">
+            ANSYS Inc. "ANSYS SpaceClaim — Direct Modeler for Simulation."
+            <a href="https://www.ansys.com/products/3d-design/ansys-spaceclaim" rel="noopener">
+              ansys.com/products/3d-design/ansys-spaceclaim</a>.
+            [Link to be verified against 2025 R2 documentation before training delivery.]
+          </li>
+          <li id="ref-2">
+            ANSYS Inc. "ANSYS Workbench — Simulation Framework."
+            <a href="https://www.ansys.com/products/ansys-workbench" rel="noopener">
+              ansys.com/products/ansys-workbench</a>.
+            [Link to be verified.]
+          </li>
+          <li id="ref-3">
+            ANSYS Inc. "ANSYS Mechanical — Structural FEA."
+            <a href="https://www.ansys.com/products/structures/ansys-mechanical" rel="noopener">
+              ansys.com/products/structures/ansys-mechanical</a>.
+            [Link to be verified.]
+          </li>
+          <li id="ref-4">
+            ANSYS Inc. "ANSYS Icepak — Electronics Thermal Management."
+            <a href="https://www.ansys.com/products/electronics/ansys-icepak" rel="noopener">
+              ansys.com/products/electronics/ansys-icepak</a>.
+            [Link to be verified.]
+          </li>
+          <li id="ref-5">
+            ANSYS Inc. "ANSYS Maxwell — Low-Frequency Electromagnetic Analysis."
+            <a href="https://www.ansys.com/products/electronics/ansys-maxwell" rel="noopener">
+              ansys.com/products/electronics/ansys-maxwell</a>.
+            [Link to be verified.]
+          </li>
+        </ol>
+      </section>
+
+      <!-- Phase navigation -->
+      <nav class="phase-nav" aria-label="Phase navigation">
+        <a class="phase-nav-btn is-prev is-disabled" aria-disabled="true">
+          <span class="nav-arrow" aria-hidden="true">&larr;</span>
+          <span class="nav-label">
+            <span class="nav-direction">Previous</span>
+            <span class="nav-title">No previous phase</span>
+          </span>
+        </a>
+        <a href="../phase-2/" class="phase-nav-btn is-next is-disabled" aria-disabled="true">
+          <span class="nav-label">
+            <span class="nav-direction">Next</span>
+            <span class="nav-title">Phase 2 &mdash; SpaceClaim</span>
+          </span>
+          <span class="nav-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </nav>
+
+    </main>
+  </div>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <span>ANSYS for Mechanical Engineers</span>
+      <span>ANSYS 2025 R2 &nbsp;&middot;&nbsp; Internal use</span>
+    </div>
+  </footer>
+
+</body>
+</html>

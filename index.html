@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Hands-on ANSYS simulation training for mechanical engineers working on power electronics products. Covers SpaceClaim, Workbench, Mechanical, Icepak, and Maxwell.">
+  <meta name="description" content="ANSYS simulation training for mechanical engineers working on power electronics products. SpaceClaim, Workbench, Mechanical, Icepak, and Maxwell.">
   <link rel="canonical" href="https://stembl.github.io/ansys_pe_web/">
   <title>ANSYS for Mechanical Engineers</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,10 +15,8 @@
 
   <header class="site-header" role="banner">
     <div class="container">
-      <a href="/" class="site-logo">ANSYS Training</a>
-      <div class="header-right">
-        <span class="version-pill">2025 R2</span>
-      </div>
+      <a href="." class="site-logo">ANSYS Training</a>
+      <span class="version-pill">2025 R2</span>
     </div>
   </header>
 
@@ -37,10 +35,10 @@
     <div class="container">
 
       <header class="sect-header">
-        <span class="sect-label">Sections</span>
+        <span class="sect-label">Phases</span>
         <h2>From geometry to multi-physics</h2>
         <p>
-          Each section builds on the last. Geometry preparation is the foundation —
+          Each phase builds on the last. Geometry preparation is the foundation —
           every analysis downstream depends on getting it right.
         </p>
       </header>
@@ -48,54 +46,54 @@
       <ol class="curriculum-grid" role="list">
 
         <li class="curriculum-card">
-          <span class="card-section-label" aria-label="Section 1">Section 01</span>
-          <h3>Foundations</h3>
+          <span class="card-section-label" aria-label="Phase 1">Phase 01</span>
+          <h3>Orientation</h3>
           <p>
-            The ANSYS product landscape, how to use the customer training portal without getting
-            misled by older-version content, importing geometry from CAD into SpaceClaim, and
-            what goes wrong when models are too complex.
+            The ANSYS product family, how Workbench connects analysis tools, and how to
+            keep project files organized — including the archive format and when to save
+            results versus setup only.
           </p>
           <ul class="card-tags" aria-label="Topics">
-            <li class="tag">ANSYS Workbench</li>
-            <li class="tag">SpaceClaim import</li>
-            <li class="tag">CAD workflow</li>
-            <li class="tag">Model complexity</li>
+            <li class="tag">Product landscape</li>
+            <li class="tag">Workbench</li>
+            <li class="tag">File types</li>
+            <li class="tag">Project archive</li>
           </ul>
+          <a href="phase-1/" class="card-cta">Open phase &rarr;</a>
         </li>
 
         <li class="curriculum-card">
-          <span class="card-section-label" aria-label="Section 2">Section 02</span>
+          <span class="card-section-label" aria-label="Phase 2">Phase 02</span>
           <h3>SpaceClaim Model Preparation</h3>
           <p>
-            Geometry simplification for structural, thermal, and electromagnetic analyses.
-            Remove mesh-hostile features, create fluid volumes, and size air regions —
-            working from a real STEP file throughout.
+            CAD import, identifying mesh-hostile geometry, defeaturing for structural,
+            thermal, and electromagnetic analyses, and shared topology for bonded contact.
           </p>
           <ul class="card-tags" aria-label="Topics">
-            <li class="tag">SpaceClaim</li>
+            <li class="tag">CAD import</li>
             <li class="tag">Defeaturing</li>
             <li class="tag">Fluid volumes</li>
-            <li class="tag">Air region sizing</li>
+            <li class="tag">Shared topology</li>
           </ul>
         </li>
 
         <li class="curriculum-card">
-          <span class="card-section-label" aria-label="Section 3">Section 03</span>
-          <h3>Workbench and Meshing</h3>
+          <span class="card-section-label" aria-label="Phase 3">Phase 03</span>
+          <h3>Meshing</h3>
           <p>
-            The Workbench project workflow, mesh quality metrics, sizing strategies and
-            rules of thumb, and the iterative cycle between mesh failure and geometry repair.
+            Mesh quality metrics, sizing strategy, mesh methods, inflation layers,
+            and the iterative cycle between mesh failure and geometry repair.
           </p>
           <ul class="card-tags" aria-label="Topics">
-            <li class="tag">ANSYS Workbench</li>
-            <li class="tag">Mesh quality</li>
+            <li class="tag">Quality metrics</li>
             <li class="tag">Sizing strategy</li>
+            <li class="tag">Inflation</li>
             <li class="tag">Failure recovery</li>
           </ul>
         </li>
 
         <li class="curriculum-card">
-          <span class="card-section-label" aria-label="Section 4">Section 04</span>
+          <span class="card-section-label" aria-label="Phase 4">Phase 04</span>
           <h3>Structural and Thermal Analyses</h3>
           <p>
             Static structural, modal analysis and random vibration, steady-state thermal
@@ -110,20 +108,46 @@
         </li>
 
         <li class="curriculum-card">
-          <span class="card-section-label" aria-label="Section 5">Section 05</span>
-          <h3>Icepak, Maxwell, and Multi-Physics</h3>
+          <span class="card-section-label" aria-label="Phase 5">Phase 05</span>
+          <h3>Icepak</h3>
           <p>
-            Thermal CFD with ANSYS Icepak — airflow, power sources, compact models, and
-            parametric heatsink studies. Electromagnetic analysis with ANSYS Maxwell —
-            DC conduction, eddy current losses, and transformer modeling. Coupled
-            EM-to-thermal workflows.
+            Thermal CFD for electronics: building models, airflow and fans, compact thermal
+            models, parametric heatsink studies, and correlating results to hardware measurements.
           </p>
           <ul class="card-tags" aria-label="Topics">
-            <li class="tag">ANSYS Icepak</li>
-            <li class="tag">ANSYS Maxwell</li>
             <li class="tag">CFD</li>
-            <li class="tag">EM losses</li>
-            <li class="tag">Multi-physics</li>
+            <li class="tag">Compact models</li>
+            <li class="tag">Parametric study</li>
+            <li class="tag">Hardware correlation</li>
+          </ul>
+        </li>
+
+        <li class="curriculum-card">
+          <span class="card-section-label" aria-label="Phase 6">Phase 06</span>
+          <h3>Maxwell</h3>
+          <p>
+            Electromagnetic analysis: DC conduction and joule heating, eddy current losses,
+            transformer winding and core losses, and exporting loss maps for thermal analysis.
+          </p>
+          <ul class="card-tags" aria-label="Topics">
+            <li class="tag">DC conduction</li>
+            <li class="tag">Eddy current</li>
+            <li class="tag">Transformer losses</li>
+            <li class="tag">Loss export</li>
+          </ul>
+        </li>
+
+        <li class="curriculum-card">
+          <span class="card-section-label" aria-label="Phase 7">Phase 07</span>
+          <h3>Multi-Physics and Closing</h3>
+          <p>
+            Linking Maxwell and Icepak in Workbench, tracing a design change through the
+            full analysis chain, and communicating simulation results at a design review.
+          </p>
+          <ul class="card-tags" aria-label="Topics">
+            <li class="tag">Workbench linking</li>
+            <li class="tag">Design change</li>
+            <li class="tag">Result communication</li>
           </ul>
         </li>
 

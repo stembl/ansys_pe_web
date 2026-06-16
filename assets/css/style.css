@@ -3,16 +3,12 @@
    ansys_pe_web | ANSYS 2025 R2
    ========================================================================== */
 
-/* --------------------------------------------------------------------------
-   Google Fonts — Inter
-   -------------------------------------------------------------------------- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 /* --------------------------------------------------------------------------
    Custom properties
    -------------------------------------------------------------------------- */
 :root {
-  /* Color */
   --c-bg:           #F7F8FA;
   --c-surface:      #FFFFFF;
   --c-border:       #E4E7ED;
@@ -25,20 +21,18 @@
   --c-accent-hover: #B45309;
   --c-accent-dim:   #FEF3C7;
 
-  /* Typography */
-  --font: 'Inter', system-ui, -apple-system, sans-serif;
+  --font:      'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
 
-  /* Type scale */
-  --t-xs:   0.75rem;    /*  12px */
-  --t-sm:   0.875rem;   /*  14px */
-  --t-base: 1.0625rem;  /*  17px — larger for classroom readability */
-  --t-lg:   1.125rem;   /*  18px */
-  --t-xl:   1.375rem;   /*  22px */
-  --t-2xl:  1.75rem;    /*  28px */
-  --t-3xl:  2.25rem;    /*  36px */
-  --t-4xl:  3rem;       /*  48px */
+  --t-xs:   0.75rem;
+  --t-sm:   0.875rem;
+  --t-base: 1.0625rem;
+  --t-lg:   1.125rem;
+  --t-xl:   1.375rem;
+  --t-2xl:  1.75rem;
+  --t-3xl:  2.25rem;
+  --t-4xl:  3rem;
 
-  /* Spacing */
   --s-1:  0.25rem;
   --s-2:  0.5rem;
   --s-3:  0.75rem;
@@ -52,18 +46,19 @@
   --s-20: 5rem;
   --s-24: 6rem;
 
-  /* Layout */
-  --max-w:     960px;
-  --r-sm:      4px;
-  --r:         8px;
-  --r-lg:      12px;
-  --r-xl:      16px;
+  --max-w:    960px;
+  --r-sm:     4px;
+  --r:        8px;
+  --r-lg:     12px;
+  --r-xl:     16px;
 
-  /* Shadows */
   --shadow-xs: 0 1px 2px rgba(0,0,0,.05);
   --shadow-sm: 0 1px 4px rgba(0,0,0,.07), 0 0 0 1px var(--c-border);
   --shadow-md: 0 4px 12px rgba(0,0,0,.08), 0 0 0 1px var(--c-border);
   --shadow-lg: 0 8px 24px rgba(0,0,0,.10), 0 0 0 1px #D1D5DB;
+
+  --header-h: 57px;
+  --sidebar-w: 248px;
 }
 
 /* --------------------------------------------------------------------------
@@ -85,12 +80,11 @@ body {
 }
 
 img { display: block; max-width: 100%; height: auto; }
-
 a { color: var(--c-accent); text-decoration-thickness: 1px; text-underline-offset: 3px; }
 a:hover { color: var(--c-accent-hover); }
 
 /* --------------------------------------------------------------------------
-   Layout
+   Shared layout
    -------------------------------------------------------------------------- */
 .container {
   width: 100%;
@@ -106,11 +100,13 @@ a:hover { color: var(--c-accent-hover); }
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(11, 22, 40, 0.96);
+  height: var(--header-h);
+  background: rgba(11, 22, 40, 0.97);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border-bottom: 1px solid rgba(255,255,255,0.07);
-  padding-block: var(--s-4);
+  display: flex;
+  align-items: center;
 }
 
 .site-header .container {
@@ -129,12 +125,6 @@ a:hover { color: var(--c-accent-hover); }
 }
 .site-logo:hover { color: #fff; }
 
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: var(--s-4);
-}
-
 .version-pill {
   font-size: var(--t-xs);
   font-weight: 600;
@@ -148,11 +138,10 @@ a:hover { color: var(--c-accent-hover); }
 }
 
 /* --------------------------------------------------------------------------
-   Hero
+   Hero — landing page only
    -------------------------------------------------------------------------- */
 .hero {
   background-color: var(--c-primary);
-  /* Dot-grid texture — pure CSS, no image */
   background-image: radial-gradient(circle, rgba(255,255,255,0.055) 1px, transparent 1px);
   background-size: 28px 28px;
   padding-block: var(--s-24) var(--s-20);
@@ -174,17 +163,13 @@ a:hover { color: var(--c-accent-hover); }
   line-height: 1.75;
   color: rgba(255,255,255,0.6);
   max-width: 58ch;
-  margin-bottom: var(--s-10);
 }
 
 /* --------------------------------------------------------------------------
-   Main content
+   Landing page: curriculum grid
    -------------------------------------------------------------------------- */
 main { flex: 1; padding-block: var(--s-20); }
 
-/* --------------------------------------------------------------------------
-   Section header
-   -------------------------------------------------------------------------- */
 .sect-header { margin-bottom: var(--s-12); }
 
 .sect-label {
@@ -213,9 +198,6 @@ main { flex: 1; padding-block: var(--s-20); }
   line-height: 1.75;
 }
 
-/* --------------------------------------------------------------------------
-   Curriculum cards
-   -------------------------------------------------------------------------- */
 .curriculum-grid {
   list-style: none;
   display: grid;
@@ -227,13 +209,14 @@ main { flex: 1; padding-block: var(--s-20); }
   border-radius: var(--r-xl);
   padding: var(--s-8);
   box-shadow: var(--shadow-sm);
-  transition: box-shadow 0.2s ease, transform 0.2s ease;
   display: flex;
   flex-direction: column;
   gap: var(--s-3);
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
 }
 
-.curriculum-card:hover {
+/* Hover only for cards that have a CTA link */
+.curriculum-card:has(.card-cta):hover {
   box-shadow: var(--shadow-lg);
   transform: translateY(-2px);
 }
@@ -278,6 +261,406 @@ main { flex: 1; padding-block: var(--s-20); }
   padding: 2px var(--s-3);
 }
 
+.card-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-top: var(--s-3);
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--c-accent);
+  text-decoration: none;
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--c-border-light);
+}
+.card-cta:hover { color: var(--c-accent-hover); }
+
+/* --------------------------------------------------------------------------
+   Content page layout (phase pages)
+   -------------------------------------------------------------------------- */
+.page-wrap {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+/* --------------------------------------------------------------------------
+   Sidebar
+   -------------------------------------------------------------------------- */
+.sidebar {
+  width: var(--sidebar-w);
+  flex-shrink: 0;
+  background: var(--c-surface);
+  border-right: 1px solid var(--c-border);
+  position: sticky;
+  top: var(--header-h);
+  height: calc(100vh - var(--header-h));
+  overflow-y: auto;
+  padding: var(--s-6) var(--s-5);
+}
+
+.sidebar-label {
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-text-subtle);
+  padding: 0 var(--s-3);
+  margin-bottom: var(--s-3);
+  display: block;
+}
+
+.nav-phases {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.nav-phase > a,
+.nav-phase > span {
+  display: block;
+  padding: var(--s-2) var(--s-3);
+  border-radius: var(--r-sm);
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--c-text-muted);
+  text-decoration: none;
+  line-height: 1.45;
+  transition: background 0.12s, color 0.12s;
+}
+
+.nav-phase > a:hover { background: var(--c-bg); color: var(--c-text); }
+
+.nav-phase.is-active > a {
+  background: var(--c-accent-dim);
+  color: var(--c-accent-hover);
+  font-weight: 600;
+}
+
+.nav-phase > span { color: var(--c-text-subtle); cursor: default; }
+
+/* On-page section links inside active phase */
+.nav-sub {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  margin-top: 2px;
+  margin-left: var(--s-3);
+  border-left: 2px solid var(--c-accent-dim);
+  padding-left: var(--s-3);
+}
+
+.nav-sub a {
+  display: block;
+  padding: 4px var(--s-2);
+  font-size: 0.8125rem;
+  color: var(--c-text-muted);
+  text-decoration: none;
+  border-radius: var(--r-sm);
+  transition: color 0.12s, background 0.12s;
+}
+.nav-sub a:hover { color: var(--c-text); background: var(--c-bg); }
+
+/* --------------------------------------------------------------------------
+   Content main — phase pages
+   -------------------------------------------------------------------------- */
+.content-main {
+  flex: 1;
+  min-width: 0;
+  padding: var(--s-12) var(--s-12) var(--s-20);
+  max-width: 780px;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  font-size: var(--t-sm);
+  color: var(--c-text-muted);
+  margin-bottom: var(--s-8);
+}
+
+.breadcrumb a { color: var(--c-text-muted); text-decoration: none; }
+.breadcrumb a:hover { color: var(--c-text); }
+.breadcrumb-sep { color: var(--c-text-subtle); }
+
+/* Phase header */
+.phase-header {
+  margin-bottom: var(--s-12);
+  padding-bottom: var(--s-10);
+  border-bottom: 1px solid var(--c-border-light);
+}
+
+.phase-label {
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-accent);
+  display: block;
+  margin-bottom: var(--s-3);
+}
+
+.phase-header h1 {
+  font-size: var(--t-3xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--c-text);
+  margin-bottom: var(--s-5);
+  line-height: 1.15;
+}
+
+.phase-intro {
+  font-size: var(--t-lg);
+  color: var(--c-text-muted);
+  line-height: 1.75;
+  max-width: 60ch;
+}
+
+/* --------------------------------------------------------------------------
+   Topic sections
+   -------------------------------------------------------------------------- */
+.topic {
+  margin-bottom: var(--s-16);
+  scroll-margin-top: calc(var(--header-h) + var(--s-6));
+}
+
+.topic + .topic {
+  padding-top: var(--s-16);
+  border-top: 1px solid var(--c-border-light);
+}
+
+.topic h2 {
+  font-size: var(--t-2xl);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  color: var(--c-text);
+  margin-bottom: var(--s-6);
+  line-height: 1.25;
+}
+
+.topic h3 {
+  font-size: var(--t-xl);
+  font-weight: 600;
+  color: var(--c-text);
+  margin-top: var(--s-8);
+  margin-bottom: var(--s-3);
+  line-height: 1.3;
+}
+
+.topic p {
+  margin-bottom: var(--s-5);
+  line-height: 1.75;
+}
+
+.topic p:last-child { margin-bottom: 0; }
+
+.topic ul, .topic ol {
+  margin: var(--s-3) 0 var(--s-5) var(--s-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.topic li { line-height: 1.65; }
+
+/* Inline code and filenames */
+code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--c-bg);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-sm);
+  padding: 1px 5px;
+  color: var(--c-text);
+}
+
+/* Definition list for tool glossary */
+dl { margin-top: var(--s-5); }
+dt {
+  font-weight: 700;
+  color: var(--c-text);
+  margin-top: var(--s-5);
+  margin-bottom: var(--s-1);
+}
+dt:first-child { margin-top: 0; }
+dd {
+  margin-left: var(--s-5);
+  color: var(--c-text-muted);
+  line-height: 1.7;
+}
+
+/* Table — file types */
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--t-sm);
+  margin-block: var(--s-6);
+}
+
+.data-table th {
+  text-align: left;
+  font-weight: 600;
+  color: var(--c-text-muted);
+  font-size: var(--t-xs);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: var(--s-2) var(--s-4);
+  border-bottom: 2px solid var(--c-border);
+  background: var(--c-bg);
+}
+
+.data-table td {
+  padding: var(--s-3) var(--s-4);
+  border-bottom: 1px solid var(--c-border-light);
+  vertical-align: top;
+  line-height: 1.55;
+}
+
+.data-table tr:last-child td { border-bottom: none; }
+
+/* Key points callout */
+.key-points {
+  background: var(--c-accent-dim);
+  border-left: 3px solid var(--c-accent);
+  border-radius: 0 var(--r) var(--r) 0;
+  padding: var(--s-5) var(--s-6);
+  margin-top: var(--s-8);
+}
+
+.key-points-label {
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-accent-hover);
+  display: block;
+  margin-bottom: var(--s-3);
+}
+
+.key-points ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.key-points li {
+  font-size: var(--t-sm);
+  color: var(--c-text);
+  line-height: 1.65;
+  padding-left: var(--s-4);
+  position: relative;
+}
+
+.key-points li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--c-accent);
+}
+
+/* Citation marker */
+sup.cite {
+  font-size: 0.7em;
+  color: var(--c-accent);
+  font-weight: 600;
+}
+
+/* References section */
+.references {
+  margin-top: var(--s-16);
+  padding-top: var(--s-8);
+  border-top: 1px solid var(--c-border);
+}
+
+.references h2 {
+  font-size: var(--t-sm);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+  margin-bottom: var(--s-5);
+}
+
+.references ol {
+  margin: 0;
+  padding-left: var(--s-5);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-3);
+}
+
+.references li {
+  font-size: var(--t-sm);
+  color: var(--c-text-muted);
+  line-height: 1.6;
+}
+
+.references a { font-size: var(--t-sm); }
+
+/* --------------------------------------------------------------------------
+   Phase navigation arrows
+   -------------------------------------------------------------------------- */
+.phase-nav {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: var(--s-4);
+  margin-top: var(--s-16);
+  padding-top: var(--s-8);
+  border-top: 1px solid var(--c-border);
+}
+
+.phase-nav-btn {
+  display: flex;
+  align-items: center;
+  gap: var(--s-4);
+  padding: var(--s-5) var(--s-6);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  text-decoration: none;
+  color: var(--c-text);
+  transition: border-color 0.15s, box-shadow 0.15s;
+  min-width: 200px;
+}
+
+.phase-nav-btn:hover {
+  border-color: var(--c-accent);
+  box-shadow: 0 0 0 3px var(--c-accent-dim);
+  color: var(--c-text);
+}
+
+.phase-nav-btn.is-prev { flex-direction: row; }
+.phase-nav-btn.is-next { flex-direction: row-reverse; margin-left: auto; }
+.phase-nav-btn.is-disabled { opacity: 0.3; pointer-events: none; border-style: dashed; }
+
+.nav-arrow { font-size: 1.25rem; color: var(--c-accent); line-height: 1; }
+
+.nav-label { display: flex; flex-direction: column; gap: 2px; }
+
+.nav-direction {
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+}
+
+.nav-title {
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--c-text);
+}
+
 /* --------------------------------------------------------------------------
    Footer
    -------------------------------------------------------------------------- */
@@ -286,7 +669,6 @@ main { flex: 1; padding-block: var(--s-20); }
   color: rgba(255,255,255,0.35);
   font-size: var(--t-sm);
   padding-block: var(--s-6);
-  margin-top: auto;
 }
 
 .site-footer .container {
@@ -298,8 +680,19 @@ main { flex: 1; padding-block: var(--s-20); }
 }
 
 /* --------------------------------------------------------------------------
-   Responsive — 600px+
+   Responsive
    -------------------------------------------------------------------------- */
 @media (min-width: 600px) {
   .curriculum-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 860px) {
+  .sidebar {
+    display: none; /* hidden on mobile — full nav on landing page */
+  }
+  .content-main {
+    padding: var(--s-8) var(--s-5) var(--s-12);
+  }
+  .phase-nav { flex-direction: column; }
+  .phase-nav-btn { min-width: unset; }
 }
