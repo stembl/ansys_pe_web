@@ -235,17 +235,17 @@
           Link the Modal analysis upstream. Define the PSD spectrum: acceleration (G&sup2;/Hz)
           vs. frequency, obtained from the qualification test specification or field measurement
           data. Run the analysis in each of the three principal directions (X, Y, Z) separately.
-          Set the number of modes to include to cover all modes up to at least 3&times; the
-          highest PSD frequency.
+          ANSYS recommends extracting enough modes to cover 1.5&times; the maximum frequency in
+          the PSD excitation.<sup class="cite"><a href="#ref-1">[1]</a></sup>
         </p>
 
         <h3>Result interpretation</h3>
         <p>
           All results (stress, displacement) are reported as 1-sigma (one standard deviation)
-          values. In a Gaussian distribution, 1-sigma corresponds to 68.3% probability. Most
-          qualification criteria define an acceptance threshold at 3-sigma (99.7% probability).
-          Multiply all 1-sigma results by 3 before comparing to allowable stress. ANSYS can
-          output 3-sigma directly via the Scale Factor setting in the Solution branch.
+          values — meaning 68.3% of the time the response will be less than that value.
+          You can scale the result by 2 to get 2-sigma values (95.45% probability) or by 3
+          to get 3-sigma values (99.73% probability) via the Scale Factor property in the
+          Solution branch.<sup class="cite"><a href="#ref-1">[1]</a></sup>
         </p>
         <p>
           Random vibration results are statistical — they do not represent any single point in
@@ -373,6 +373,13 @@
         </aside>
       </section>
 
+
+      <section class="references" aria-label="References">
+        <h2>References</h2>
+        <ol>
+          <li id="ref-1">ANSYS Inc. "5.6.6. Random Vibration Analysis." ANSYS Mechanical. <a href="https://ansyshelp.ansys.com/public/Views/Secured/corp/v252/en/wb_sim/ds_spectral_analysis_type.html" rel="noopener">ansyshelp.ansys.com</a>. Accessed: 2026-06-16. [ANSYS 2025 R2]</li>
+        </ol>
+      </section>
 
       <nav class="phase-nav" aria-label="Phase navigation">
         <a href="../phase-3/" class="phase-nav-btn is-prev">

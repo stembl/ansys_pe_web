@@ -178,13 +178,13 @@
           reached.
         </p>
 
-        <h3>Key settings</h3>
+        <h3>Key settings<sup class="cite"><a href="#ref-1">[1]</a></sup></h3>
         <ul>
-          <li><strong>Target energy error</strong>: set to 1% as a starting point. Lower
-              values produce more accurate results at the cost of more passes and more
-              elements.</li>
-          <li><strong>Maximum adaptive passes</strong>: default is 10. Increase to 15 or
-              20 if the solution does not converge at 1% error within 10 passes.</li>
+          <li><strong>Target energy error (Percent Error)</strong>: set to 1% as a starting
+              point. Smaller values produce more accurate but slower solutions.</li>
+          <li><strong>Maximum Number of Passes</strong>: stopping criterion if the energy
+              error target is not reached. Default is 10. Increase to 15 or 20 if the solution
+              does not converge within the default pass count.</li>
         </ul>
 
         <p>
@@ -365,6 +365,13 @@
         </aside>
       </section>
 
+
+      <section class="references" aria-label="References">
+        <h2>References</h2>
+        <ol>
+          <li id="ref-1">ANSYS Inc. "Adaptive Setup for Non-Transient Solutions." ANSYS Maxwell Help. <a href="https://ansyshelp.ansys.com/public/Views/Secured/Electronics/v242/en/Subsystems/Maxwell/Content/AdaptiveSetupforNonTransientSolutions.htm" rel="noopener">ansyshelp.ansys.com</a>. Accessed: 2026-06-16. [ANSYS 2024 R2 — v252 equivalent page not found; verify settings match in 2025 R2 before delivery]</li>
+        </ol>
+      </section>
 
       <nav class="phase-nav" aria-label="Phase navigation">
         <a href="../phase-5/" class="phase-nav-btn is-prev">

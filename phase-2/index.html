@@ -126,7 +126,7 @@
         <p>
           SpaceClaim tools for geometry inspection: <strong>Check Geometry</strong> (Design tab
           &rarr; Repair &rarr; Check Geometry) identifies face errors, open edges, and
-          self-intersections. <strong>Measure</strong> (right-click any face or edge) returns
+          self-intersections.<sup class="cite"><a href="#ref-1">[1]</a></sup> <strong>Measure</strong> (right-click any face or edge) returns
           area, length, and angles. <strong>Interference Check</strong> finds overlapping bodies.
         </p>
 
@@ -278,7 +278,7 @@
 
         <p>
           After import and defeaturing, run the repair sequence before meshing. The tools are
-          in the SpaceClaim <strong>Repair</strong> panel (Design tab &rarr; Repair):
+          in the SpaceClaim <strong>Repair</strong> panel (Design tab &rarr; Repair):<sup class="cite"><a href="#ref-2">[2]</a></sup>
         </p>
 
         <ol>
@@ -300,7 +300,7 @@
 
         <p>
           After mechanical repair, apply <strong>Share</strong> topology at all interfaces
-          where structural load or heat must transfer between parts (Design &rarr; Share).
+          where structural load or heat must transfer between parts (Design &rarr; Share).<sup class="cite"><a href="#ref-3">[3]</a></sup>
           Share creates coincident node interfaces at part boundaries. Without shared topology,
           adjacent parts have independent meshes, and the solver uses contact elements to
           transfer quantities — which is slower and introduces numerical error.
@@ -336,6 +336,15 @@
         </aside>
       </section>
 
+
+      <section class="references" aria-label="References">
+        <h2>References</h2>
+        <ol>
+          <li id="ref-1">ANSYS Inc. "Checking Geometry." ANSYS SpaceClaim. <a href="https://ansyshelp.ansys.com/public/Views/Secured/corp/v252/en/spaceclaim/Discovery/user_manual/checkgeometry.html" rel="noopener">ansyshelp.ansys.com</a>. Accessed: 2026-06-16. [ANSYS 2025 R2]</li>
+          <li id="ref-2">ANSYS Inc. "Repairing Problems." ANSYS SpaceClaim. <a href="https://ansyshelp.ansys.com/public/Views/Secured/corp/v252/en/spaceclaim/Discovery/user_manual/repair_overview.html" rel="noopener">ansyshelp.ansys.com</a>. Accessed: 2026-06-16. [ANSYS 2025 R2]</li>
+          <li id="ref-3">ANSYS Inc. "Shared Topology." ANSYS SpaceClaim. <a href="https://ansyshelp.ansys.com/public/Views/Secured/corp/v252/en/spaceclaim/Discovery/user_manual/Shared_Topology_intro.html" rel="noopener">ansyshelp.ansys.com</a>. Accessed: 2026-06-16. [ANSYS 2025 R2]</li>
+        </ol>
+      </section>
 
       <nav class="phase-nav" aria-label="Phase navigation">
         <a href="../phase-1/" class="phase-nav-btn is-prev">

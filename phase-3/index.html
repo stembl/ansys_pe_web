@@ -70,13 +70,13 @@
         </p>
 
         <dl>
-          <dt>Skewness</dt>
+          <dt>Skewness<sup class="cite"><a href="#ref-1">[1]</a></sup></dt>
           <dd>Measures deviation of an element from its ideal shape. Range: 0 (perfect)
               to 1 (degenerate). Target: mean below 0.25 and maximum below 0.9. Elements
               above 0.9 trigger solver warnings and produce inaccurate results at those
               locations.</dd>
 
-          <dt>Orthogonal quality</dt>
+          <dt>Orthogonal quality<sup class="cite"><a href="#ref-2">[2]</a></sup></dt>
           <dd>Measures alignment between element face vectors and element-to-element vectors.
               Range: 0 (worst) to 1 (ideal). Target: minimum above 0.1 as an absolute floor,
               above 0.2 for structural applications at stress concentrations.</dd>
@@ -165,21 +165,21 @@
         <h2>3.3 &nbsp;Mesh Methods</h2>
 
         <dl>
-          <dt>Patch-conforming tetrahedral (default)</dt>
+          <dt>Patch-conforming tetrahedral (default)<sup class="cite"><a href="#ref-3">[3]</a></sup></dt>
           <dd>Produces tetrahedral elements on any geometry without restriction. Works on
               imported assemblies, complex shapes, and all geometry that Check Geometry
               passes. The standard choice for electronics assemblies. Element accuracy per
               element is lower than hex, but the ease of setup and robustness compensates
               for most applications.</dd>
 
-          <dt>Multizone</dt>
+          <dt>Multizone<sup class="cite"><a href="#ref-4">[4]</a></sup></dt>
           <dd>Produces hex elements in sweepable regions and tet elsewhere. Better accuracy
               per element for prismatic geometries — heatsink fins, connector bodies, fastener
               standoffs. Requires the geometry to be decomposable into sweepable regions.
               Worth the additional SpaceClaim preparation time when these components are
               critical to the result.</dd>
 
-          <dt>Sweep</dt>
+          <dt>Sweep<sup class="cite"><a href="#ref-5">[5]</a></sup></dt>
           <dd>Structured hex through a single sweep direction. The most accurate element type
               for thin-feature bodies: solder joints, adhesive layers, TIM, laminates. Requires
               a simple, prismatic body (source face, target face, clean sweep path). Apply
@@ -212,8 +212,8 @@
         <h2>3.4 &nbsp;Inflation Layers</h2>
 
         <p>
-          Inflation adds layers of progressively refined elements near a surface. The purpose
-          differs between fluid and structural analyses.
+          Inflation adds layers of progressively refined elements near a surface.<sup class="cite"><a href="#ref-6">[6]</a></sup>
+          The purpose differs between fluid and structural analyses.
         </p>
 
         <h3>In Icepak fluid domains</h3>
@@ -302,6 +302,18 @@
         </aside>
       </section>
 
+
+      <section class="references" aria-label="References">
+        <h2>References</h2>
+        <ol>
+          <li id="ref-1">ANSYS Inc. "Skewness." ANSYS Meshing. <a href="https://ansyshelp.ansys.com/public/Views/Secured/corp/v252/en/wb_msh/msh_skewness.html" rel="noopener">ansyshelp.ansys.com</a>. Accessed: 2026-06-16. [ANSYS 2025 R2]</li>
+          <li id="ref-2">ANSYS Inc. "Orthogonal Quality." ANSYS Meshing. <a href="https://ansyshelp.ansys.com/public/Views/Secured/corp/v252/en/wb_msh/msh_orthogonal_quality.html" rel="noopener">ansyshelp.ansys.com</a>. Accessed: 2026-06-16. [ANSYS 2025 R2]</li>
+          <li id="ref-3">ANSYS Inc. "Patch Conforming Algorithm for Tetrahedrons Method Control." ANSYS Meshing. <a href="https://ansyshelp.ansys.com/public/Views/Secured/corp/v252/en/wb_msh/msh_Patch_Conf_Algor.html" rel="noopener">ansyshelp.ansys.com</a>. Accessed: 2026-06-16. [ANSYS 2025 R2]</li>
+          <li id="ref-4">ANSYS Inc. "MultiZone Method Control." ANSYS Meshing. <a href="https://ansyshelp.ansys.com/public/Views/Secured/corp/v252/en/wb_msh/ds_multizone_method_option.html" rel="noopener">ansyshelp.ansys.com</a>. Accessed: 2026-06-16. [ANSYS 2025 R2]</li>
+          <li id="ref-5">ANSYS Inc. "Sweep Method Control." ANSYS Meshing. <a href="https://ansyshelp.ansys.com/public/Views/Secured/corp/v252/en/wb_msh/ds_sweep_method_option.html" rel="noopener">ansyshelp.ansys.com</a>. Accessed: 2026-06-16. [ANSYS 2025 R2]</li>
+          <li id="ref-6">ANSYS Inc. "Inflation Controls." ANSYS Meshing. <a href="https://ansyshelp.ansys.com/public/Views/Secured/corp/v252/en/wb_msh/msh_specialized_inflation.html" rel="noopener">ansyshelp.ansys.com</a>. Accessed: 2026-06-16. [ANSYS 2025 R2]</li>
+        </ol>
+      </section>
 
       <nav class="phase-nav" aria-label="Phase navigation">
         <a href="../phase-2/" class="phase-nav-btn is-prev">
