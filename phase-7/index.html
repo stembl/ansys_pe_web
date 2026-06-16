@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Workbench multi-physics linking, managing design changes across the simulation chain, and communicating results at design reviews.">
+  <link rel="canonical" href="https://stembl.github.io/ansys_pe_web/phase-7/">
+  <title>Phase 7: Multi-Physics — ANSYS for Mechanical Engineers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <div class="container">
+      <a href="../" class="site-logo">ANSYS Training</a>
+      <span class="version-pill">2025 R2</span>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+    <nav class="sidebar" aria-label="Course navigation">
+      <span class="sidebar-label">Phases</span>
+      <ol class="nav-phases">
+        <li class="nav-phase"><a href="../phase-1/">1 &mdash; Orientation</a></li>
+        <li class="nav-phase"><a href="../phase-2/">2 &mdash; SpaceClaim</a></li>
+        <li class="nav-phase"><a href="../phase-3/">3 &mdash; Meshing</a></li>
+        <li class="nav-phase"><a href="../phase-4/">4 &mdash; Structural &amp; Thermal</a></li>
+        <li class="nav-phase"><a href="../phase-5/">5 &mdash; Icepak</a></li>
+        <li class="nav-phase"><a href="../phase-6/">6 &mdash; Maxwell</a></li>
+        <li class="nav-phase is-active">
+          <a href="../phase-7/">7 &mdash; Multi-Physics</a>
+          <ol class="nav-sub">
+            <li><a href="#workbench-linking">7.1 Workbench linking</a></li>
+            <li><a href="#design-change">7.2 Design change propagation</a></li>
+            <li><a href="#result-communication">7.3 Result communication</a></li>
+          </ol>
+        </li>
+      </ol>
+    </nav>
+
+    <main class="content-main" id="main-content">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../">Home</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <span aria-current="page">Phase 7</span>
+      </nav>
+
+      <header class="phase-header">
+        <span class="phase-label">Phase 7</span>
+        <h1>Multi-Physics and Result Communication</h1>
+        <p class="phase-intro">
+          The preceding phases built each analysis tool independently. This phase connects
+          them. A Workbench project that links Maxwell losses to Icepak heat sources and
+          Mechanical structural stress represents the complete simulation chain for a power
+          electronics assembly. The phase closes with the minimum requirements for presenting
+          simulation results at a design review.
+        </p>
+      </header>
+
+      <section class="topic" id="workbench-linking">
+        <h2>7.1 &nbsp;Workbench Multi-Physics Linking</h2>
+
+        <p>
+          Analysis systems in Workbench are linked by connecting their cells in the Project
+          Schematic. The connection type determines what information transfers.
+        </p>
+
+        <dl>
+          <dt>Geometry link</dt>
+          <dd>Connects the Geometry cell of one system to the Geometry cell of another.
+              Both systems share the same SpaceClaim body. A geometry update in SpaceClaim
+              propagates to all linked systems simultaneously. This is the correct setup
+              for any analysis sharing the same physical part.</dd>
+
+          <dt>Mesh link</dt>
+          <dd>Connects the Mesh cell between two systems. Both systems share the same
+              nodal mesh. Used when Steady-State Thermal and Static Structural should
+              solve on identical nodes to eliminate interpolation error in the temperature
+              transfer.</dd>
+
+          <dt>Solution link</dt>
+          <dd>Passes a result from one system's Solution cell as an input to another
+              system's Setup cell. Examples: Maxwell &rarr; Icepak (loss map), Steady-State
+              Thermal &rarr; Static Structural (temperature field).</dd>
+        </dl>
+
+        <h3>Maxwell to Icepak link</h3>
+        <p>
+          Connect the Maxwell Solution cell to the Icepak Setup cell. The link transfers
+          the geometry, excitation definition, and the volumetric loss map (W/m&sup3;).
+          Icepak uses the loss map as the distributed heat source for the conductor and
+          core bodies. The connection updates automatically when Maxwell is re-solved —
+          but does not trigger Icepak to re-solve. The Icepak system shows "Needs Update"
+          and must be re-solved explicitly.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 7.1">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Geometry links ensure a single SpaceClaim source propagates to all analyses.
+                If geometry is not linked, independent SpaceClaim sessions can drift out
+                of sync silently.</li>
+            <li>Mesh links between thermal and structural analyses eliminate interpolation
+                error in the temperature transfer. Use them when solder joint or thin-layer
+                accuracy is required.</li>
+            <li>The "Needs Update" indicator must be respected. A cell that needs update
+                contains stale results — results on stale inputs are not current results.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="design-change">
+        <h2>7.2 &nbsp;Design Change Propagation</h2>
+
+        <p>
+          A geometry change in SpaceClaim propagates through the analysis chain in a defined
+          order. Each system downstream of the change must be updated before its results are
+          valid.
+        </p>
+
+        <p>
+          Typical propagation order for an electromagnetic-thermal chain:
+        </p>
+        <ol>
+          <li>SpaceClaim geometry update</li>
+          <li>Maxwell geometry import (Needs Update)</li>
+          <li>Maxwell solve (Needs Update)</li>
+          <li>Icepak geometry import (Needs Update via loss link)</li>
+          <li>Icepak mesh (Needs Update if geometry changed significantly)</li>
+          <li>Icepak solve (Needs Update)</li>
+          <li>Mechanical Structural temperature import (Needs Update if linked to Icepak)</li>
+          <li>Mechanical solve (Needs Update)</li>
+        </ol>
+
+        <p>
+          The rule: update from the topmost stale cell down. Never update a downstream cell
+          without updating all cells above it in the chain. Doing so produces results on
+          stale upstream inputs — the "Needs Update" indicator on the downstream cell will
+          clear, but the results are not current.
+        </p>
+
+        <h3>Validation after a design change</h3>
+        <p>
+          After propagating an update, verify three things before reporting results:
+        </p>
+        <ul>
+          <li>The geometry change is visible in the downstream model — inspect the viewer
+              to confirm the change propagated correctly.</li>
+          <li>The mesh quality is still adequate — check metrics after re-mesh. A geometry
+              change can introduce new sliver faces or degrade quality in the modified region.</li>
+          <li>Boundary conditions still apply to the correct faces — a geometry change
+              can delete the face that a fixed support, heat source, or excitation was
+              applied to. Missing boundary conditions do not always produce solver errors;
+              they may produce silently wrong results.</li>
+        </ul>
+
+        <aside class="key-points" aria-label="Key points for 7.2">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Always update from the topmost stale cell downward. Partial updates give
+                downstream results on stale upstream inputs.</li>
+            <li>Check that boundary conditions still target valid geometry after every
+                geometric change. Deleted faces silently remove the boundary condition.</li>
+            <li>The version of geometry in each analysis system must be consistent.
+                A system that was not updated after a geometry change contains results
+                from a previous design — label all results with the geometry version.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="result-communication">
+        <h2>7.3 &nbsp;Result Communication and Documentation</h2>
+
+        <p>
+          A simulation result presented at a design review must carry enough context to be
+          interpretable and checkable. A stress contour plot without context cannot be
+          evaluated — it is not possible to determine whether it represents a safe design
+          without knowing what assumptions produced it.
+        </p>
+
+        <h3>Minimum required context for any simulation result</h3>
+        <ul>
+          <li><strong>ANSYS version</strong> — which solver version produced the result.</li>
+          <li><strong>Analysis type</strong> — e.g., "Steady-state thermal with JEDEC compact
+              component models; forced convection not modeled."</li>
+          <li><strong>Material assumptions</strong> — any non-default or estimated material
+              properties, e.g., "FR4 through-thickness conductivity assumed 0.3&nbsp;W/m&middot;K."</li>
+          <li><strong>Boundary condition summary</strong> — how constrained, where loads applied,
+              what convection coefficient or CFD boundary was used.</li>
+          <li><strong>Mesh quality</strong> — worst-case skewness and orthogonal quality; or,
+              if mesh convergence was verified, state the refinement ratio and the change in the
+              result quantity.</li>
+          <li><strong>Key assumptions</strong> — any simplification of reality: no radiation,
+              no contact resistance, uniform power, symmetric model, etc.</li>
+          <li><strong>Known limitations</strong> — what the model does not capture that could
+              affect the conclusion.</li>
+        </ul>
+
+        <h3>What "the simulation says X" means</h3>
+        <p>
+          The simulation predicts X given the geometry, material properties, and boundary
+          conditions that were entered. It does not independently verify that those inputs
+          are correct. The burden of verifying inputs is on the analyst. A result produced
+          from incorrect inputs is a precisely computed wrong answer.
+        </p>
+
+        <h3>Exporting results</h3>
+        <ul>
+          <li><strong>Images</strong>: use the ANSYS result plots directly. Label each with
+              result type, units, and scale range. Set the scale range explicitly — the auto-scale
+              compresses to the data range and may hide gradients that are important at the
+              design limit.</li>
+          <li><strong>Reports</strong>: Mechanical &rarr; Solution &rarr; Report Preview
+              generates an HTML report with all active results. Use this for formal documentation.</li>
+          <li><strong>Tabular data</strong>: Solution &rarr; Export exports nodal or element
+              data as CSV for post-processing or direct comparison with measurements.</li>
+        </ul>
+
+        <aside class="key-points" aria-label="Key points for 7.3">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>A result without a stated analysis type, version, and key assumptions cannot
+                be evaluated. Present the context, not just the contour.</li>
+            <li>Set result scale ranges explicitly for design review images. Auto-scale
+                optimizes visual contrast, not engineering relevance — a yellow contour
+                at 150&deg;C and at 55&deg;C look identical on auto-scale.</li>
+            <li>State what the model does not capture. A thermal model without radiation
+                overpredicts temperature in a radiation-cooled region — stating this gives
+                reviewers the information to assess conservatism.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="references" aria-label="References">
+        <h2>References</h2>
+        <ol>
+          <li>ANSYS Inc. "Workbench User's Guide — System Coupling and Linked Analyses."
+              ANSYS Help. <a href="https://ansyshelp.ansys.com" rel="noopener">ansyshelp.ansys.com</a>
+              [login required; verify against 2025&nbsp;R2 before training delivery].</li>
+          <li>ANSYS Inc. "Mechanical User's Guide — Solution Report."
+              ANSYS Help. [login required].</li>
+        </ol>
+      </section>
+
+      <nav class="phase-nav" aria-label="Phase navigation">
+        <a href="../phase-6/" class="phase-nav-btn is-prev">
+          <span class="nav-arrow" aria-hidden="true">&larr;</span>
+          <span class="nav-label">
+            <span class="nav-direction">Previous</span>
+            <span class="nav-title">Phase 6 &mdash; Maxwell</span>
+          </span>
+        </a>
+        <span class="phase-nav-btn is-next is-disabled" aria-disabled="true">
+          <span class="nav-label">
+            <span class="nav-direction">End of course</span>
+            <span class="nav-title">All phases complete</span>
+          </span>
+        </span>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <span>ANSYS for Mechanical Engineers</span>
+      <span>ANSYS 2025 R2 &nbsp;&middot;&nbsp; Internal use</span>
+    </div>
+  </footer>
+</body>
+</html>

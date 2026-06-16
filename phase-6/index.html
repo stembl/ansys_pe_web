@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="ANSYS Maxwell: solver types, geometry and setup, adaptive meshing, DC conduction, transformer losses, and exporting losses to Icepak.">
+  <link rel="canonical" href="https://stembl.github.io/ansys_pe_web/phase-6/">
+  <title>Phase 6: Maxwell — ANSYS for Mechanical Engineers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <div class="container">
+      <a href="../" class="site-logo">ANSYS Training</a>
+      <span class="version-pill">2025 R2</span>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+    <nav class="sidebar" aria-label="Course navigation">
+      <span class="sidebar-label">Phases</span>
+      <ol class="nav-phases">
+        <li class="nav-phase"><a href="../phase-1/">1 &mdash; Orientation</a></li>
+        <li class="nav-phase"><a href="../phase-2/">2 &mdash; SpaceClaim</a></li>
+        <li class="nav-phase"><a href="../phase-3/">3 &mdash; Meshing</a></li>
+        <li class="nav-phase"><a href="../phase-4/">4 &mdash; Structural &amp; Thermal</a></li>
+        <li class="nav-phase"><a href="../phase-5/">5 &mdash; Icepak</a></li>
+        <li class="nav-phase is-active">
+          <a href="../phase-6/">6 &mdash; Maxwell</a>
+          <ol class="nav-sub">
+            <li><a href="#maxwell-orientation">6.1 Orientation</a></li>
+            <li><a href="#geometry-setup">6.2 Geometry &amp; setup</a></li>
+            <li><a href="#maxwell-meshing">6.3 Adaptive meshing</a></li>
+            <li><a href="#dc-conduction">6.4 DC conduction</a></li>
+            <li><a href="#transformer-losses">6.5 Transformer losses</a></li>
+            <li><a href="#loss-export">6.6 Exporting losses</a></li>
+          </ol>
+        </li>
+        <li class="nav-phase"><a href="../phase-7/">7 &mdash; Multi-Physics</a></li>
+      </ol>
+    </nav>
+
+    <main class="content-main" id="main-content">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../">Home</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <span aria-current="page">Phase 6</span>
+      </nav>
+
+      <header class="phase-header">
+        <span class="phase-label">Phase 6</span>
+        <h1>Maxwell</h1>
+        <p class="phase-intro">
+          Maxwell solves low-frequency electromagnetic field problems using the finite element
+          method. For power electronics, the three most common applications are DC current
+          distribution, AC winding losses in magnetics, and transformer loss characterization.
+          This phase covers the Maxwell workflow from geometry setup through loss export.
+        </p>
+      </header>
+
+      <section class="topic" id="maxwell-orientation">
+        <h2>6.1 &nbsp;Maxwell Solver Types</h2>
+
+        <p>
+          Three solver types cover power electronics electromagnetic analysis:
+        </p>
+
+        <dl>
+          <dt>Magnetostatic</dt>
+          <dd>Solves the static (DC) magnetic field. Returns flux density distribution,
+              inductance, force, and torque. Does not compute AC losses or eddy currents.
+              Use for: inductance extraction, core flux density mapping, force on conductors
+              or magnetic components, DC resistance distribution.</dd>
+
+          <dt>Eddy Current (AC frequency domain)</dt>
+          <dd>Solves the steady-state response at a single frequency. Returns ohmic losses
+              including skin effect and proximity effect, core losses, and impedance. Use for:
+              transformer winding losses at switching frequency, busbar AC resistance, skin
+              depth verification. This is the starting point for most power magnetics loss
+              estimation — 10–100&times; faster than transient.</dd>
+
+          <dt>Transient (time domain)</dt>
+          <dd>Solves the full time-varying field at arbitrary waveform. Most accurate for
+              switching converters but the slowest solver by a large margin. Use when:
+              actual waveform shape is critical (duty cycle effects, non-sinusoidal
+              excitation), saturation occurs during the switching cycle, or inrush
+              behavior is the concern.</dd>
+        </dl>
+
+        <p>
+          Starting point recommendation: use Eddy Current at the fundamental switching
+          frequency for transformer and inductor loss estimation. It produces a reliable
+          estimate in a fraction of the transient solve time and is sufficient for most
+          design decisions.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 6.1">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Magnetostatic gives inductance and force — it does not give AC losses.
+                For winding and core loss, use Eddy Current.</li>
+            <li>Eddy Current is the practical choice for most power magnetics work. Reserve
+                Transient for cases where waveform shape or saturation dynamics matter.</li>
+            <li>Maxwell is a separate design environment from Workbench — it opens as its
+                own application. The <code>.aedt</code> file is the Maxwell project file.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="geometry-setup">
+        <h2>6.2 &nbsp;Geometry and Setup</h2>
+
+        <h3>Air region</h3>
+        <p>
+          The simulation domain must be bounded by an air or vacuum region. Create a box
+          enclosing the device with 3&times; clearance in each principal direction as a starting
+          point. Verify by comparing results at 3&times; and 5&times; clearance — if inductance
+          or total loss changes by more than 2%, use 5&times;. The field must approach zero at
+          the region boundary; too small an air region compresses field lines and produces
+          wrong inductance and loss values.
+        </p>
+
+        <h3>Material assignment</h3>
+        <p>
+          <strong>Conductors</strong>: assign bulk conductivity (&sigma;, S/m) at the
+          operating temperature. Copper conductivity varies significantly with temperature
+          (58 MS/m at 20&deg;C, 45 MS/m at 75&deg;C) — enter the value at operating temperature
+          for accurate loss calculations.
+        </p>
+        <p>
+          <strong>Core material</strong>: assign relative permeability (&mu;<sub>r</sub>) and
+          core loss coefficients (Steinmetz parameters). Core loss coefficients must come from
+          the specific core material datasheet — not from generic ferrite approximations in the
+          material library. Using incorrect Steinmetz parameters for a different core material
+          produces errors of 2–5&times; in core loss predictions.
+        </p>
+
+        <h3>Excitation</h3>
+        <p>
+          <strong>Current excitation</strong>: specifies total ampere-turns through a winding
+          cross-section. The most common setup for inductors and transformers.
+          <strong>Voltage excitation</strong>: specifies voltage across a winding terminal.
+          Use when the voltage waveform is the controlled variable.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 6.2">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Core loss coefficients must match the actual core material at the operating
+                flux density and frequency. These values are not interchangeable between
+                materials or manufacturers.</li>
+            <li>Copper conductivity at elevated temperature is significantly lower than at
+                room temperature. Use the operating temperature value.</li>
+            <li>Verify the air region size. This step is commonly skipped with the assumption
+                that 3&times; is always adequate — it is not for all geometries.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="maxwell-meshing">
+        <h2>6.3 &nbsp;Maxwell Adaptive Meshing</h2>
+
+        <p>
+          Maxwell's meshing approach is fundamentally different from Mechanical. The solver
+          manages the mesh automatically through an adaptive refinement process — the engineer
+          sets convergence targets, not element sizes.
+        </p>
+
+        <p>
+          The adaptive process: the solver generates an initial coarse mesh, solves, and
+          computes the energy error — the fractional change in total field energy between
+          successive passes. Where the error is highest, the mesh is refined. This repeats
+          until the energy error falls below the target or the maximum number of passes is
+          reached.
+        </p>
+
+        <h3>Key settings</h3>
+        <ul>
+          <li><strong>Target energy error</strong>: set to 1% as a starting point. Lower
+              values produce more accurate results at the cost of more passes and more
+              elements.</li>
+          <li><strong>Maximum adaptive passes</strong>: default is 10. Increase to 15 or
+              20 if the solution does not converge at 1% error within 10 passes.</li>
+        </ul>
+
+        <p>
+          Do not attempt to manually control Maxwell mesh density the way you would in
+          Mechanical. The adaptive engine identifies where refinement is needed. If the
+          solution fails to converge after 15 passes:
+        </p>
+        <ol>
+          <li>Check for geometry problems — thin gaps between conductors, near-zero-thickness
+              insulation layers, or very small radii at conductor edges.</li>
+          <li>Add a manual mesh seed on the critical geometry (faces near windings or air
+              gaps) to help the initial mesh capture those regions.</li>
+          <li>Increase the maximum passes to 20.</li>
+        </ol>
+
+        <aside class="key-points" aria-label="Key points for 6.3">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Maxwell handles meshing automatically. Do not set element sizes manually —
+                set the energy error target and let the solver refine where needed.</li>
+            <li>Non-convergence in 10 passes usually means there is a geometry problem or
+                the energy error target is too tight for the initial mesh. Investigate
+                geometry first.</li>
+            <li>1% energy error is an appropriate starting target for most power electronics
+                applications. It balances accuracy against solve time.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="dc-conduction">
+        <h2>6.4 &nbsp;DC Conduction and Joule Heating</h2>
+
+        <p>
+          Use the DC conduction solver (or Eddy Current at near-zero frequency) to compute
+          current distribution and ohmic losses in conductors under steady DC excitation.
+        </p>
+
+        <h3>Setup</h3>
+        <p>
+          Assign voltage boundary conditions at the conductor terminals: 0&nbsp;V at one
+          terminal, the applied DC voltage at the other. Assign bulk conductivity to all
+          conductor bodies. The solver computes the current density field throughout the
+          conductor volume.
+        </p>
+
+        <h3>Key results</h3>
+        <ul>
+          <li><strong>Current density (J, A/m&sup2;)</strong>: shows where current
+              concentrates. High-current-density regions have proportionally higher local
+              power dissipation.</li>
+          <li><strong>Joule loss density (W/m&sup3;)</strong>: volumetric power dissipation.
+              Integrates to total ohmic loss. Compare the integrated total loss to the
+              expected I&sup2;R for a sanity check before using the result.</li>
+          <li><strong>DC resistance</strong>: computed from total loss and applied current.
+              Compare to the hand-calculated DC resistance.</li>
+        </ul>
+
+        <p>
+          Current density is not uniform in a conductor with varying cross-section — it
+          concentrates at corners and at necked-down regions. The volumetric loss map (W/m&sup3;)
+          can be exported directly as a distributed heat source in Icepak or Mechanical
+          Thermal. This is more accurate than applying a uniform heat flux to the conductor
+          surface.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 6.4">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Always compare the computed DC resistance to I&sup2;R before proceeding.
+                A factor-of-two error in computed resistance means a geometry or material
+                assignment error.</li>
+            <li>Current concentrates at corners and cross-section reductions — these are
+                the highest-temperature locations in a busbar or connector, not the average
+                surface.</li>
+            <li>Export the joule loss density map to Icepak or Mechanical Thermal for an
+                accurate distributed heat source rather than assuming uniform heating.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="transformer-losses">
+        <h2>6.5 &nbsp;Transformer Winding and Core Losses</h2>
+
+        <p>
+          Use the Eddy Current solver at the switching frequency. For non-sinusoidal waveforms
+          (square wave, trapezoidal), decompose the excitation into harmonics and run the
+          solver at each significant harmonic; sum the losses.
+        </p>
+
+        <h3>Winding losses</h3>
+        <p>
+          Assign each winding layer as a separate conductor with its current excitation
+          (ampere-turns, in the correct phase and direction for primary vs. secondary).
+          The solver returns the current density distribution across each conductor
+          cross-section.
+        </p>
+        <p>
+          <strong>Proximity effect</strong>: the magnetic field from adjacent winding layers
+          induces eddy currents that add to each conductor's self-induced skin-effect currents.
+          In multi-layer windings at high frequencies, proximity effect loss can exceed
+          skin-effect loss by 5–10&times;. This is not visible in a simple resistance
+          calculation. Maxwell shows it as a current density plot across the winding
+          cross-section — high-density on the face closest to the adjacent layer is the
+          proximity effect signature. This is the result that informs litz wire or winding
+          interleaving decisions.
+        </p>
+
+        <h3>Core losses</h3>
+        <p>
+          The Steinmetz parameters (k, &alpha;, &beta;) for the specific core material must
+          be entered in the material definition. The solver returns the core loss density
+          distribution, which shows whether loss is uniform in the core or concentrated
+          at specific regions (indicating flux crowding at corners or in narrow sections).
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 6.5">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Proximity effect is the dominant loss mechanism in multi-layer windings at
+                high frequency. It cannot be estimated by hand and is the primary motivation
+                for using Maxwell for magnetics design.</li>
+            <li>Steinmetz parameters must match the actual core material, frequency range,
+                and flux density range from the datasheet. Parameters outside the
+                characterization range extrapolate with unknown accuracy.</li>
+            <li>For multi-frequency excitation, run the solver at each significant harmonic
+                and sum the losses. Skin depth and proximity effect are frequency-dependent
+                — a single fundamental-frequency run misses harmonic contributions.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="loss-export">
+        <h2>6.6 &nbsp;Exporting Maxwell Losses to Icepak</h2>
+
+        <p>
+          After an Eddy Current or Transient solve, Maxwell produces a spatial distribution
+          of ohmic losses (W/m&sup3;) across every conductor and core body in the model.
+          This loss map can be imported into Icepak as a distributed heat source.
+        </p>
+
+        <h3>Export and import workflow</h3>
+        <p>
+          In Workbench: connect the Maxwell component to the Icepak component using a loss
+          link (drag from Maxwell Solution cell to Icepak Setup cell). This connection
+          transfers: geometry, material assignments, and the loss map. When Maxwell is
+          re-solved, the connection propagates the updated loss map to Icepak automatically.
+        </p>
+        <p>
+          In Icepak: the imported loss map assigns different power density to different
+          regions of the conductor body — high at surfaces (skin effect) and at faces
+          adjacent to neighboring conductors (proximity effect). The Icepak solve uses
+          this spatial distribution as the volumetric heat source.
+        </p>
+
+        <p>
+          The practical difference from uniform power assignment is largest where loss
+          concentration is high: high-frequency windings, transformer cores with non-uniform
+          flux density, and busbars with cross-section changes. For a copper winding at
+          200&nbsp;kHz, the current and loss are concentrated in a skin depth of approximately
+          0.15&nbsp;mm from the conductor surface — a significant fraction of the total
+          conductor volume generates almost no heat, while the surface layer generates nearly
+          all of it.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 6.6">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>The Workbench loss link transfers losses automatically when Maxwell is
+                re-solved. Verify the Icepak system shows "Needs Update" after a Maxwell
+                solve change, then update Icepak before drawing thermal conclusions.</li>
+            <li>Uniform power assignment to a winding overestimates the temperature at the
+                conductor center and underestimates it at the conductor surface. The loss
+                map is more accurate for surface insulation temperature assessment.</li>
+            <li>Skin depth for copper at 200&nbsp;kHz is approximately 0.15&nbsp;mm. For
+                windings with conductor dimensions larger than 3&times; the skin depth,
+                the loss distribution is significantly non-uniform.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="references" aria-label="References">
+        <h2>References</h2>
+        <ol>
+          <li>ANSYS Inc. "Maxwell User's Guide."
+              ANSYS Help. <a href="https://ansyshelp.ansys.com" rel="noopener">ansyshelp.ansys.com</a>
+              [login required; verify against 2025&nbsp;R2 before training delivery].</li>
+          <li>Dowell, P. L. "Effects of eddy currents in transformer windings."
+              <em>Proceedings of the IEE</em>, 113(8), 1966.
+              [Foundational reference for proximity effect in transformer windings.]</li>
+          <li>Steinmetz, C. P. "On the law of hysteresis."
+              <em>Transactions of the American Institute of Electrical Engineers</em>, 9, 1892.
+              [Historical basis for Steinmetz core loss model.]</li>
+        </ol>
+      </section>
+
+      <nav class="phase-nav" aria-label="Phase navigation">
+        <a href="../phase-5/" class="phase-nav-btn is-prev">
+          <span class="nav-arrow" aria-hidden="true">&larr;</span>
+          <span class="nav-label">
+            <span class="nav-direction">Previous</span>
+            <span class="nav-title">Phase 5 &mdash; Icepak</span>
+          </span>
+        </a>
+        <a href="../phase-7/" class="phase-nav-btn is-next">
+          <span class="nav-label">
+            <span class="nav-direction">Next</span>
+            <span class="nav-title">Phase 7 &mdash; Multi-Physics</span>
+          </span>
+          <span class="nav-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <span>ANSYS for Mechanical Engineers</span>
+      <span>ANSYS 2025 R2 &nbsp;&middot;&nbsp; Internal use</span>
+    </div>
+  </footer>
+</body>
+</html>

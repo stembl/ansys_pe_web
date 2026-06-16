@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Static structural, modal analysis, random vibration, thermal-structural coupling, and plastic deformation in ANSYS Mechanical.">
+  <link rel="canonical" href="https://stembl.github.io/ansys_pe_web/phase-4/">
+  <title>Phase 4: Structural &amp; Thermal — ANSYS for Mechanical Engineers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <div class="container">
+      <a href="../" class="site-logo">ANSYS Training</a>
+      <span class="version-pill">2025 R2</span>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+    <nav class="sidebar" aria-label="Course navigation">
+      <span class="sidebar-label">Phases</span>
+      <ol class="nav-phases">
+        <li class="nav-phase"><a href="../phase-1/">1 &mdash; Orientation</a></li>
+        <li class="nav-phase"><a href="../phase-2/">2 &mdash; SpaceClaim</a></li>
+        <li class="nav-phase"><a href="../phase-3/">3 &mdash; Meshing</a></li>
+        <li class="nav-phase is-active">
+          <a href="../phase-4/">4 &mdash; Structural &amp; Thermal</a>
+          <ol class="nav-sub">
+            <li><a href="#static-setup">4.1 Static structural: setup</a></li>
+            <li><a href="#static-results">4.2 Static structural: results</a></li>
+            <li><a href="#modal">4.3 Modal analysis</a></li>
+            <li><a href="#random-vibration">4.4 Random vibration</a></li>
+            <li><a href="#thermal-structural">4.5 Thermal-structural</a></li>
+            <li><a href="#plastic">4.6 Plastic deformation</a></li>
+          </ol>
+        </li>
+        <li class="nav-phase"><a href="../phase-5/">5 &mdash; Icepak</a></li>
+        <li class="nav-phase"><a href="../phase-6/">6 &mdash; Maxwell</a></li>
+        <li class="nav-phase"><a href="../phase-7/">7 &mdash; Multi-Physics</a></li>
+      </ol>
+    </nav>
+
+    <main class="content-main" id="main-content">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../">Home</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <span aria-current="page">Phase 4</span>
+      </nav>
+
+      <header class="phase-header">
+        <span class="phase-label">Phase 4</span>
+        <h1>Structural and Thermal Analyses</h1>
+        <p class="phase-intro">
+          This phase covers the six analysis types most commonly needed for power electronics
+          mechanical qualification: static stress, modal frequency extraction, random
+          vibration, thermal-structural coupling, and plastic deformation. The analyses
+          are presented in the order they are typically run — each builds on the previous.
+        </p>
+      </header>
+
+      <section class="topic" id="static-setup">
+        <h2>4.1 &nbsp;Static Structural: Setup</h2>
+
+        <p>
+          Boundary conditions define the rigid-body constraint and load application. The
+          constraint must match the physical installation — over-constraining gives
+          artificially low deflection and stress; under-constraining causes rigid-body
+          motion and solver failure.
+        </p>
+
+        <h3>Support types</h3>
+        <ul>
+          <li><strong>Fixed support</strong>: all degrees of freedom at the selected face
+              are zero. Use at bolted connections when the bolt interface is substantially
+              stiffer than the structure.</li>
+          <li><strong>Frictionless support</strong>: normal displacement constrained, lateral
+              free. Use at symmetry planes and at surfaces resting on a flat rigid fixture.</li>
+          <li><strong>Elastic support</strong>: spring stiffness between surface and ground.
+              Use when the supporting structure has a known compliance.</li>
+          <li><strong>Displacement</strong>: prescribes specific displacement values at a
+              surface. Use for imposed deformation boundary conditions.</li>
+        </ul>
+
+        <h3>Load types</h3>
+        <ul>
+          <li><strong>Acceleration</strong>: applies a body force proportional to component
+              mass. The standard input for g-load qualification (transportation, seismic,
+              shock).</li>
+          <li><strong>Force / pressure</strong>: direct load at known magnitude and direction.</li>
+          <li><strong>Thermal condition</strong>: imported temperature field from a linked
+              thermal analysis. Drives CTE expansion.</li>
+        </ul>
+
+        <h3>Contact definitions</h3>
+        <ul>
+          <li><strong>Bonded</strong>: no separation or sliding. Default for soldered,
+              adhesively bonded, or press-fit interfaces.</li>
+          <li><strong>Frictional</strong>: Coulomb friction model. Use when slip and
+              friction force affect the structural result.</li>
+          <li><strong>No separation</strong>: surfaces cannot pull apart but can slide freely.
+              Use at sliding interfaces that cannot separate under the applied load.</li>
+        </ul>
+
+        <p>
+          Verify setup before solving: insert a Reaction Force probe at the support (Solution
+          &rarr; Insert &rarr; Probe &rarr; Force Reaction). The sum of reaction forces must
+          equal the sum of applied forces. A significant imbalance means the model is
+          incorrectly constrained.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 4.1">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Check reaction force balance before interpreting any result. An unbalanced
+                model has a constraint error that invalidates the results.</li>
+            <li>Match the structural support to the physical installation exactly. A free
+                surface in reality that is fixed in the model will show artificially low
+                stress at that face and artificially high stress redistributed elsewhere.</li>
+            <li>Bonded contact is the correct default for all soldered and adhesively bonded
+                interfaces. Frictionless contact between bonded parts is a modeling error.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="static-results">
+        <h2>4.2 &nbsp;Static Structural: Results</h2>
+
+        <dl>
+          <dt>Von Mises (equivalent) stress</dt>
+          <dd>The standard yield criterion for ductile metals (steel, aluminum, copper).
+              Compare directly to yield strength. Safety factor = yield strength / Von Mises
+              stress. Use as the primary result for metals.</dd>
+
+          <dt>Maximum principal stress</dt>
+          <dd>The largest tensile stress at a point. Use for brittle materials (FR4 laminate,
+              ceramic, glass) and for crack growth assessment. FR4 fails in tension on the
+              outer fiber — maximum principal stress is the relevant criterion.</dd>
+
+          <dt>Total deformation</dt>
+          <dd>Displacement magnitude. Use to verify that deflections do not cause secondary
+              failures: connector disengagement, interference with adjacent components, or
+              board-level curvature exceeding component attachment limits.</dd>
+        </dl>
+
+        <h3>Mesh singularities</h3>
+        <p>
+          A perfectly sharp re-entrant corner in a finite element model produces stress that
+          grows without bound as the mesh is refined. This is a modeling artifact, not a
+          physical stress. Distinguish a singularity from a real stress concentration:
+        </p>
+        <ul>
+          <li>At a fillet or radius: stress converges to a finite value as mesh refines.
+              This is physically real — report it.</li>
+          <li>At a perfectly sharp internal corner: stress increases without converging as
+              mesh refines. Replace the corner with the minimum physical radius from
+              manufacturing tolerance, then re-run.</li>
+        </ul>
+
+        <aside class="key-points" aria-label="Key points for 4.2">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>If the peak stress is at a sharp corner in the model, it is likely a
+                singularity. Add the physical fillet radius and re-run before reporting
+                the result.</li>
+            <li>Use Von Mises for ductile metals; maximum principal stress for brittle
+                materials and FR4 laminate.</li>
+            <li>Always check deformation — structural adequacy includes both stress margin
+                and displacement limits at connectors and mounting interfaces.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="modal">
+        <h2>4.3 &nbsp;Modal Analysis</h2>
+
+        <p>
+          Modal analysis computes the natural frequencies and mode shapes of the structure.
+          It is always run before random vibration analysis — random vibration requires modal
+          results as its upstream input.
+        </p>
+
+        <p>
+          Setup: apply the same structural supports as the static analysis. No loads are
+          required (modal is a free-vibration problem — the solver finds frequencies at which
+          the structure vibrates naturally given its mass and stiffness distribution). Set the
+          number of modes to extract to cover at least 1.5&times; the highest frequency of
+          interest in the subsequent random vibration analysis.
+        </p>
+
+        <p>
+          The solver computes natural frequencies &omega; and mode shapes {&phi;} from:
+          [K]{&phi;} = &omega;&sup2;[M]{&phi;}. Mode shapes are unit-normalized — the
+          reported displacement magnitude has no physical meaning. Only the shape matters.
+          Visualize each mode to identify which structural elements participate: a mode
+          dominated by board flexure behaves differently under vibration than a mode
+          dominated by component rocking.
+        </p>
+
+        <p>
+          Free-free modal (no supports): if supports are removed, the first six modes will
+          be rigid-body modes at near-zero frequency. These are correct but not useful.
+          The first flexible mode is the lowest frequency above the rigid-body modes.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 4.3">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Boundary conditions for modal must match the structural installation exactly.
+                An unconstrained direction that is constrained in reality will produce an
+                artificially high frequency for modes in that direction.</li>
+            <li>Mode shape amplitude is meaningless — only the shape and frequency matter.
+                The amplitude is set by the normalization method, not the physical vibration.</li>
+            <li>Extract enough modes to cover 1.5&times; the PSD spectrum frequency range.
+                Missing modes in the frequency range of interest produces unconservative
+                random vibration results.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="random-vibration">
+        <h2>4.4 &nbsp;Random Vibration (RSD/PSD)</h2>
+
+        <p>
+          Random vibration analysis applies a Power Spectral Density (PSD) spectrum to the
+          modal results to compute the statistical stress and displacement response in a
+          broadband vibration environment.
+        </p>
+
+        <h3>Setup</h3>
+        <p>
+          Link the Modal analysis upstream. Define the PSD spectrum: acceleration (G&sup2;/Hz)
+          vs. frequency, obtained from the qualification test specification or field measurement
+          data. Run the analysis in each of the three principal directions (X, Y, Z) separately.
+          Set the number of modes to include to cover all modes up to at least 3&times; the
+          highest PSD frequency.
+        </p>
+
+        <h3>Result interpretation</h3>
+        <p>
+          All results (stress, displacement) are reported as 1-sigma (one standard deviation)
+          values. In a Gaussian distribution, 1-sigma corresponds to 68.3% probability. Most
+          qualification criteria define an acceptance threshold at 3-sigma (99.7% probability).
+          Multiply all 1-sigma results by 3 before comparing to allowable stress. ANSYS can
+          output 3-sigma directly via the Scale Factor setting in the Solution branch.
+        </p>
+        <p>
+          Random vibration results are statistical — they do not represent any single point in
+          time. The 3-sigma stress cannot be compared to yield strength as a failure criterion
+          in the same way static stress can. For qualification, compare to the fatigue allowable
+          or the test-verified acceptance threshold specified in the applicable standard.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 4.4">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>The PSD input comes from the test specification or measured environment.
+                Do not define it from engineering judgment — use the actual spec curve.</li>
+            <li>1-sigma results must be multiplied by 3 before comparison to most qualification
+                criteria. Set the Scale Factor in Mechanical or multiply manually.</li>
+            <li>Random vibration results are statistical. Present them with their sigma level
+                stated explicitly — "3-sigma Von Mises stress = X MPa" is a complete statement;
+                "stress = X MPa" is not.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="thermal-structural">
+        <h2>4.5 &nbsp;Steady-State Thermal and CTE-Driven Stress</h2>
+
+        <p>
+          The thermal-structural workflow links two Workbench systems: a Steady-State Thermal
+          analysis that computes the temperature distribution, and a Static Structural analysis
+          that imports the temperature field and computes the resulting thermal expansion stress.
+        </p>
+
+        <h3>Steady-State Thermal setup</h3>
+        <p>
+          Inputs: thermal conductivity for all materials, power dissipation at each heat source
+          (component power), and convection coefficients or convection boundary conditions at
+          surfaces exposed to air. The output is a nodal temperature distribution.
+        </p>
+
+        <h3>Thermal-structural link</h3>
+        <p>
+          In the Static Structural analysis, insert a Thermal Condition load (Solution &rarr;
+          Insert &rarr; Thermal Condition). This maps the temperature field from the thermal
+          analysis onto the structural mesh node-by-node. Where the structural and thermal
+          meshes differ (separate systems), ANSYS interpolates the temperatures. Verify the
+          transfer: plot temperature in the structural model before solving. An incorrect
+          transfer appears as uniform ambient temperature everywhere — if the temperature
+          field looks constant, the link is broken.
+        </p>
+
+        <h3>Stress-free reference temperature</h3>
+        <p>
+          The structural model computes thermal expansion relative to a reference temperature
+          — the temperature at which the assembly is stress-free. For soldered assemblies,
+          this is approximately the reflow temperature (~260&deg;C for lead-free solder), not
+          room temperature. An incorrect reference temperature produces incorrect CTE stress
+          magnitude and direction.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 4.5">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Verify the temperature transfer before solving. A failed transfer is silent
+                — the model solves but with uniform temperature, producing near-zero stress
+                that looks correct but is not.</li>
+            <li>Set the stress-free reference temperature to the assembly bonding temperature,
+                not to room temperature. For soldered PCB assemblies, this is typically
+                260&deg;C (lead-free reflow).</li>
+            <li>CTE mismatch between copper traces (17 ppm/&deg;C) and FR4 laminate
+                (14–18 ppm/&deg;C in-plane, 50–70 ppm/&deg;C through-thickness) is the
+                dominant thermal stress driver at solder joints.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="plastic">
+        <h2>4.6 &nbsp;Plastic Deformation</h2>
+
+        <p>
+          Standard linear analysis assumes stress is proportional to strain and that the
+          material returns to its original shape when the load is removed. When stress exceeds
+          the yield strength, neither assumption holds. Plastic analysis uses a nonlinear
+          material model to follow the stress-strain curve through yield.
+        </p>
+
+        <h3>Material model</h3>
+        <p>
+          Two common options in ANSYS Engineering Data:
+        </p>
+        <ul>
+          <li><strong>Bilinear isotropic hardening (BISO)</strong>: two-slope approximation.
+              Requires elastic modulus, yield strength, and tangent modulus. Simple and
+              computationally efficient. Appropriate when the full stress-strain curve is
+              not available.</li>
+          <li><strong>Multilinear isotropic hardening (MISO)</strong>: full stress-strain
+              curve entered as a table. More accurate for large plastic strains. Requires
+              material testing data or certified datasheet values.</li>
+        </ul>
+
+        <h3>Solver and convergence</h3>
+        <p>
+          Plastic analysis uses Newton-Raphson iteration at each load step. If it does not
+          converge: reduce the load step increment first (split the load into more steps).
+          Do not change the material model or mesh as a first response to convergence failure.
+          Convergence failure at a particular load level indicates that the material is being
+          pushed past a steep region of the stress-strain curve — smaller steps resolve this.
+        </p>
+
+        <p>
+          If full stress-strain data is not available: run the analysis as linear-elastic and
+          compare peak Von Mises stress to yield strength. Regions above yield in the elastic
+          model will yield — the elastic result does not give the post-yield state, but it
+          identifies which locations require attention.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 4.6">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>When Newton-Raphson fails to converge, reduce the load step increment.
+                This is the correct first response — not changing the material model.</li>
+            <li>Plastic deformation requires material data past yield strength. BISO is
+                the practical choice when only yield strength and a modulus are available.</li>
+            <li>Identify yielded regions by plotting equivalent plastic strain. Non-zero
+                plastic strain indicates permanent deformation under the applied load.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="references" aria-label="References">
+        <h2>References</h2>
+        <ol>
+          <li>ANSYS Inc. "Mechanical User's Guide — Static Structural Analysis."
+              ANSYS Help. <a href="https://ansyshelp.ansys.com" rel="noopener">ansyshelp.ansys.com</a>
+              [login required; verify against 2025&nbsp;R2 before training delivery].</li>
+          <li>ANSYS Inc. "Mechanical User's Guide — Random Vibration Analysis."
+              ANSYS Help. [login required].</li>
+          <li>ANSYS Inc. "Mechanical User's Guide — Nonlinear Analysis."
+              ANSYS Help. [login required].</li>
+        </ol>
+      </section>
+
+      <nav class="phase-nav" aria-label="Phase navigation">
+        <a href="../phase-3/" class="phase-nav-btn is-prev">
+          <span class="nav-arrow" aria-hidden="true">&larr;</span>
+          <span class="nav-label">
+            <span class="nav-direction">Previous</span>
+            <span class="nav-title">Phase 3 &mdash; Meshing</span>
+          </span>
+        </a>
+        <a href="../phase-5/" class="phase-nav-btn is-next">
+          <span class="nav-label">
+            <span class="nav-direction">Next</span>
+            <span class="nav-title">Phase 5 &mdash; Icepak</span>
+          </span>
+          <span class="nav-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <span>ANSYS for Mechanical Engineers</span>
+      <span>ANSYS 2025 R2 &nbsp;&middot;&nbsp; Internal use</span>
+    </div>
+  </footer>
+</body>
+</html>

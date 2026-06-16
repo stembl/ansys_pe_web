@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="CAD import, identifying mesh-hostile geometry, defeaturing for structural, thermal, and Maxwell analyses, and geometry repair in SpaceClaim.">
+  <link rel="canonical" href="https://stembl.github.io/ansys_pe_web/phase-2/">
+  <title>Phase 2: SpaceClaim — ANSYS for Mechanical Engineers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+
+  <header class="site-header" role="banner">
+    <div class="container">
+      <a href="../" class="site-logo">ANSYS Training</a>
+      <span class="version-pill">2025 R2</span>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+    <nav class="sidebar" aria-label="Course navigation">
+      <span class="sidebar-label">Phases</span>
+      <ol class="nav-phases">
+        <li class="nav-phase"><a href="../phase-1/">1 &mdash; Orientation</a></li>
+        <li class="nav-phase is-active">
+          <a href="../phase-2/">2 &mdash; SpaceClaim</a>
+          <ol class="nav-sub">
+            <li><a href="#cad-import">2.1 Importing CAD</a></li>
+            <li><a href="#mesh-hostile">2.2 Mesh-hostile geometry</a></li>
+            <li><a href="#defeature-structural">2.3 Defeaturing: structural</a></li>
+            <li><a href="#defeature-thermal">2.4 Defeaturing: thermal</a></li>
+            <li><a href="#defeature-maxwell">2.5 Defeaturing: Maxwell</a></li>
+            <li><a href="#repair-prep">2.6 Repair &amp; final prep</a></li>
+          </ol>
+        </li>
+        <li class="nav-phase"><a href="../phase-3/">3 &mdash; Meshing</a></li>
+        <li class="nav-phase"><a href="../phase-4/">4 &mdash; Structural &amp; Thermal</a></li>
+        <li class="nav-phase"><a href="../phase-5/">5 &mdash; Icepak</a></li>
+        <li class="nav-phase"><a href="../phase-6/">6 &mdash; Maxwell</a></li>
+        <li class="nav-phase"><a href="../phase-7/">7 &mdash; Multi-Physics</a></li>
+      </ol>
+    </nav>
+
+    <main class="content-main" id="main-content">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../">Home</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <span aria-current="page">Phase 2</span>
+      </nav>
+
+      <header class="phase-header">
+        <span class="phase-label">Phase 2</span>
+        <h1>SpaceClaim Model Preparation</h1>
+        <p class="phase-intro">
+          Simulation accuracy begins with geometry quality. A mesh built on defective geometry
+          cannot produce reliable results regardless of solver settings or mesh density.
+          This phase covers the full SpaceClaim workflow: importing geometry, identifying
+          problems before meshing, preparing models for structural, thermal, and electromagnetic
+          analyses, and running a complete repair sequence before handoff to the mesher.
+        </p>
+      </header>
+
+      <section class="topic" id="cad-import">
+        <h2>2.1 &nbsp;Importing CAD</h2>
+
+        <p>
+          SpaceClaim accepts STEP, IGES, Parasolid, ACIS, and native formats from major
+          CAD systems through available translators. STEP is the preferred neutral format —
+          it preserves topology more reliably than IGES and handles assembly structure better.
+          Export as STEP AP214, verify units before import, and check the result immediately.
+        </p>
+
+        <p>
+          Automatic healing runs on import, but it is not complete cleaning. After any import,
+          verify: body count matches the source assembly, the Interference Check reports no
+          overlapping bodies, and mating faces are actually touching rather than separated by
+          a small gap.
+        </p>
+
+        <p>
+          STEP from a complex multi-body assembly does not guarantee correct dimensions or
+          correct part-to-part relationships. Tolerance accumulation, unit conversion rounding,
+          and missing assembly constraints are common. These problems are invisible visually
+          but cause immediate mesh failures or silently wrong results.
+        </p>
+
+        <p>
+          When imported geometry is unreliable, building the simulation model in SpaceClaim
+          from scratch is faster than repairing it. For simple parts with clean CAD history,
+          import is fine. For complex assemblies with tight tolerances or critical mating
+          surfaces, build what you need directly.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 2.1">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Verify body count and run Interference Check immediately after import. Fix
+                geometry problems before opening the mesher.</li>
+            <li>STEP AP214 is the most compatible export from any CAD system. Confirm units
+                are not mixed (all mm or all m) before importing.</li>
+            <li>If a mesh fails on imported geometry, return to SpaceClaim first. The cause
+                is almost always the geometry, not the mesh settings.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="mesh-hostile">
+        <h2>2.2 &nbsp;Identifying Mesh-Hostile Geometry</h2>
+
+        <p>
+          Walk the geometry in SpaceClaim before opening the mesher. The goal is a single
+          repair pass, not an iterative repair-mesh-fail-repair loop.
+        </p>
+
+        <p>
+          The most common mesh-hostile features: thin slivers (faces with extreme length-to-width
+          ratio), faces smaller than the target element size, edges shorter than the target
+          element size, near-tangent surfaces (two faces meeting at a shallow angle), gaps
+          between mating bodies, and re-entrant corners at or below 90&deg;.
+        </p>
+
+        <p>
+          SpaceClaim tools for geometry inspection: <strong>Check Geometry</strong> (Design tab
+          &rarr; Repair &rarr; Check Geometry) identifies face errors, open edges, and
+          self-intersections. <strong>Measure</strong> (right-click any face or edge) returns
+          area, length, and angles. <strong>Interference Check</strong> finds overlapping bodies.
+        </p>
+
+        <p>
+          Check Geometry reports geometric errors but does not find all mesh-hostile features.
+          Small faces and short edges only appear as mesh warnings or failures, not as Check
+          Geometry errors. Use mesh quality metrics as a feedback loop: after the first mesh,
+          go back to SpaceClaim for features that drove poor quality — not just outright failures.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 2.2">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>The mesh fails or degrades exactly where the geometry is bad. Identify problems
+                before meshing, not after.</li>
+            <li>Thin slivers and near-zero-angle edges are the most common source of high skewness
+                elements. They rarely appear in Check Geometry — look for them manually by
+                inspecting highly curved or thin regions.</li>
+            <li>A feature smaller than the target mesh size will force the mesher to reduce
+                element size everywhere near it, not just at that feature.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="defeature-structural">
+        <h2>2.3 &nbsp;Defeaturing for Structural Analysis</h2>
+
+        <p>
+          Before removing anything, determine the load path. Where are the constraints? Where
+          are the loads? Where are the expected stress concentrations? Features in high-gradient
+          regions must be preserved or carefully assessed. Features remote from the load path
+          and below the structural scale of interest can be removed.
+        </p>
+
+        <p>
+          Rules of thumb: holes smaller than 10% of the minimum structural dimension in a
+          low-stress region can be suppressed. Fillets and chamfers smaller than 1/10 of the
+          smallest expected stress feature do not affect results. Decorative features (embossed
+          text, cosmetic knurling) can always be removed. Fastener hardware can typically be
+          replaced with bonded contact at the fastener footprint.
+        </p>
+
+        <p>
+          The threshold question: if this feature is removed, does the stress result at the
+          locations of interest change by more than the acceptable error? If the answer is
+          no for a realistic load magnitude, remove it. The answer requires knowing the load
+          path — you cannot make this judgment without it.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 2.3">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Establish the load path before defeaturing. Features near the load path and
+                at stress concentrations must be preserved or their effect evaluated.</li>
+            <li>A 0.5&nbsp;mm fillet on a PCB connector tab does not change board-level
+                bending stress. It may add 50,000 elements. The judgment is knowing which
+                features affect the result at the scale of interest.</li>
+            <li>Retain all interface surfaces (contact faces), all boundary condition
+                application points, and all features at known stress concentrations.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="defeature-thermal">
+        <h2>2.4 &nbsp;Defeaturing for Thermal and Icepak Analysis</h2>
+
+        <p>
+          Identify the thermal model requirements before modifying geometry. Which components
+          are heat sources? What is the fluid path? Which surfaces transfer heat by convection?
+          Which interfaces transfer heat by conduction? Features outside the heat path can be
+          simplified aggressively. Thermal interface surfaces — component footprints, TIM
+          layers, heatsink contact — must be preserved exactly.
+        </p>
+
+        <p>
+          Icepak requires an explicit fluid volume. If air carries heat in the enclosure, that
+          air must exist as a geometry body assigned air material. Create fluid volumes using
+          SpaceClaim's <strong>Fill</strong> tool (Design &rarr; Fill), which creates a solid
+          body from an enclosed region. Do not create fluid volumes manually face by face.
+        </p>
+
+        <p>
+          Thermal interface rules: component footprint faces must be coplanar with the board
+          surface — any gap becomes a thermal air gap in the simulation. A 0.1&nbsp;mm air
+          gap between a component body and the PCB adds meaningful thermal resistance and
+          will produce incorrect junction temperature predictions.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 2.4">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Icepak has no implicit fluid. Every enclosed airspace that carries heat must
+                be an explicit body assigned air material.</li>
+            <li>Use the Fill tool to create fluid volumes. It is faster and more reliable
+                than constructing them manually from surface operations.</li>
+            <li>Face-to-face contact at every conduction interface. A small gap at a component
+                footprint is the most common cause of overpredicted junction temperature.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="defeature-maxwell">
+        <h2>2.5 &nbsp;Defeaturing for Maxwell</h2>
+
+        <p>
+          Maxwell analyses require a bounded domain. Before modifying the device geometry,
+          identify: which conductors carry current, which materials have significant
+          permeability or conductivity, and whether the field distribution has any symmetry
+          planes. Features outside the active field region can be removed. Features that
+          define current paths — conductor cross-sections, insulation gaps — must be exact.
+        </p>
+
+        <p>
+          <strong>Air region</strong>: the most important step. Create a box or sphere
+          enclosing the device with 3&times; clearance in each direction as a starting point.
+          Verify by comparing results at 3&times; and 5&times; clearance — if inductance or
+          loss changes by more than 2%, use 5&times;.
+        </p>
+
+        <p>
+          <strong>Symmetry</strong>: identify any planes of symmetry in the field distribution
+          and apply symmetry cuts. A half-model solves in half the time. Verify that the
+          excitation is symmetric before applying. Asymmetric excitation (e.g., winding
+          current direction) invalidates symmetry.
+        </p>
+
+        <p>
+          <strong>Winding simplification</strong>: round wire cross-sections can be replaced
+          with equivalent rectangular cross-sections of the same area. The field solution is
+          nearly identical for strand counts above approximately 10 wires. This simplification
+          dramatically reduces element count in winding regions.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 2.5">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>The air region size determines boundary condition accuracy. Verify by comparing
+                results at 3&times; and 5&times; — do not assume 3&times; is always sufficient.</li>
+            <li>Symmetry is the single most effective way to reduce Maxwell solve time.
+                Each valid symmetry plane halves the element count.</li>
+            <li>Winding cross-section shape (round vs. rectangular) matters less than winding
+                area and position. Simplify to rectangular for cleaner meshing.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="repair-prep">
+        <h2>2.6 &nbsp;Geometry Repair and Final Preparation</h2>
+
+        <p>
+          After import and defeaturing, run the repair sequence before meshing. The tools are
+          in the SpaceClaim <strong>Repair</strong> panel (Design tab &rarr; Repair):
+        </p>
+
+        <ol>
+          <li><strong>Check Geometry</strong> &mdash; run first. Lists face errors, open
+              edges, and self-intersections. Every item in this list is a potential mesh failure.</li>
+          <li><strong>Fix</strong> &mdash; automatic repair pass. Stitches open edges, merges
+              duplicate surfaces, closes small gaps within the specified tolerance. Resolves
+              most STEP import artifacts in one step. Set the tolerance to 10&times; the smallest
+              significant feature dimension.</li>
+          <li><strong>Close Gaps</strong> &mdash; closes sub-threshold gaps at part interfaces.
+              Set the tolerance to match the tightest acceptable gap in the design.</li>
+          <li><strong>Remove Slivers</strong> &mdash; eliminates narrow face strips below a
+              specified width. Slivers are the most common source of high-skewness elements
+              in imported assemblies.</li>
+          <li><strong>Merge Faces</strong> &mdash; combines coplanar or co-cylindrical faces
+              that were split by the import. Reduces face count and produces larger, more
+              uniform mesh elements on flat surfaces.</li>
+        </ol>
+
+        <p>
+          After mechanical repair, apply <strong>Share</strong> topology at all interfaces
+          where structural load or heat must transfer between parts (Design &rarr; Share).
+          Share creates coincident node interfaces at part boundaries. Without shared topology,
+          adjacent parts have independent meshes, and the solver uses contact elements to
+          transfer quantities — which is slower and introduces numerical error.
+        </p>
+
+        <h3>Icepak geometry preparation tool</h3>
+        <p>
+          The Icepak geometry preparation tool (available through the Electronics Desktop
+          integration) performs the repair sequence automatically on an entire assembly in one
+          pass. It constructs a shrinkwrapped exterior mesh and discards all interior geometry.
+          The result meshes very cleanly because it is a simple outer surface.
+        </p>
+        <p>
+          The tradeoff is irreversible: all internal geometry is discarded — internal conductor
+          paths, component bodies, board layers, and internal structure are gone. Use this tool
+          when: the assembly is too complex to repair manually and only exterior convection
+          surfaces are needed, or when manual repair is exhausted and the mesh still fails.
+          Make a copy of the original geometry before applying it. Do not use it as a default
+          first step.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 2.6">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Run Check Geometry on every imported model. Fix what it finds before meshing.
+                Every listed problem is a potential mesh failure point.</li>
+            <li>Apply Share topology at every interface where load or heat transfers between
+                parts. A missed interface shows as a physically impossible temperature or
+                stress discontinuity at that face.</li>
+            <li>The Icepak preparation tool destroys interior geometry. Appropriate as a last
+                resort for exterior-only thermal analysis — not as a default cleanup step.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="references" aria-label="References">
+        <h2>References</h2>
+        <ol>
+          <li>ANSYS Inc. "SpaceClaim User's Guide — Import and Repair."
+              ANSYS Help. <a href="https://ansyshelp.ansys.com" rel="noopener">ansyshelp.ansys.com</a>
+              [login required; verify against 2025&nbsp;R2 before training delivery].</li>
+          <li>ANSYS Inc. "Icepak User's Guide — Geometry Preparation."
+              ANSYS Help. [login required].</li>
+          <li>ANSYS Inc. "Maxwell User's Guide — Domain and Boundary Setup."
+              ANSYS Help. [login required].</li>
+        </ol>
+      </section>
+
+      <nav class="phase-nav" aria-label="Phase navigation">
+        <a href="../phase-1/" class="phase-nav-btn is-prev">
+          <span class="nav-arrow" aria-hidden="true">&larr;</span>
+          <span class="nav-label">
+            <span class="nav-direction">Previous</span>
+            <span class="nav-title">Phase 1 &mdash; Orientation</span>
+          </span>
+        </a>
+        <a href="../phase-3/" class="phase-nav-btn is-next">
+          <span class="nav-label">
+            <span class="nav-direction">Next</span>
+            <span class="nav-title">Phase 3 &mdash; Meshing</span>
+          </span>
+          <span class="nav-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <span>ANSYS for Mechanical Engineers</span>
+      <span>ANSYS 2025 R2 &nbsp;&middot;&nbsp; Internal use</span>
+    </div>
+  </footer>
+</body>
+</html>

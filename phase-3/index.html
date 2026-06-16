@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Mesh quality metrics, global vs. local sizing, mesh methods, inflation layers, and diagnosing mesh failures in ANSYS Mechanical.">
+  <link rel="canonical" href="https://stembl.github.io/ansys_pe_web/phase-3/">
+  <title>Phase 3: Meshing — ANSYS for Mechanical Engineers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <div class="container">
+      <a href="../" class="site-logo">ANSYS Training</a>
+      <span class="version-pill">2025 R2</span>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+    <nav class="sidebar" aria-label="Course navigation">
+      <span class="sidebar-label">Phases</span>
+      <ol class="nav-phases">
+        <li class="nav-phase"><a href="../phase-1/">1 &mdash; Orientation</a></li>
+        <li class="nav-phase"><a href="../phase-2/">2 &mdash; SpaceClaim</a></li>
+        <li class="nav-phase is-active">
+          <a href="../phase-3/">3 &mdash; Meshing</a>
+          <ol class="nav-sub">
+            <li><a href="#quality-metrics">3.1 Quality metrics</a></li>
+            <li><a href="#sizing-strategy">3.2 Sizing strategy</a></li>
+            <li><a href="#mesh-methods">3.3 Mesh methods</a></li>
+            <li><a href="#inflation">3.4 Inflation layers</a></li>
+            <li><a href="#failure-diagnosis">3.5 Diagnosing failure</a></li>
+          </ol>
+        </li>
+        <li class="nav-phase"><a href="../phase-4/">4 &mdash; Structural &amp; Thermal</a></li>
+        <li class="nav-phase"><a href="../phase-5/">5 &mdash; Icepak</a></li>
+        <li class="nav-phase"><a href="../phase-6/">6 &mdash; Maxwell</a></li>
+        <li class="nav-phase"><a href="../phase-7/">7 &mdash; Multi-Physics</a></li>
+      </ol>
+    </nav>
+
+    <main class="content-main" id="main-content">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../">Home</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <span aria-current="page">Phase 3</span>
+      </nav>
+
+      <header class="phase-header">
+        <span class="phase-label">Phase 3</span>
+        <h1>Meshing</h1>
+        <p class="phase-intro">
+          The mesh is the bridge between geometry and the solver. Its quality determines
+          whether the solver produces accurate results, converges in reasonable time, or
+          fails. This phase covers the metrics that define mesh quality, how to set element
+          sizes efficiently, the mesh methods available in Mechanical, and how to diagnose
+          and resolve failures.
+        </p>
+      </header>
+
+      <section class="topic" id="quality-metrics">
+        <h2>3.1 &nbsp;Mesh Quality Metrics</h2>
+
+        <p>
+          Three metrics appear in the Mesh Metrics panel and drive most quality decisions:
+        </p>
+
+        <dl>
+          <dt>Skewness</dt>
+          <dd>Measures deviation of an element from its ideal shape. Range: 0 (perfect)
+              to 1 (degenerate). Target: mean below 0.25 and maximum below 0.9. Elements
+              above 0.9 trigger solver warnings and produce inaccurate results at those
+              locations.</dd>
+
+          <dt>Orthogonal quality</dt>
+          <dd>Measures alignment between element face vectors and element-to-element vectors.
+              Range: 0 (worst) to 1 (ideal). Target: minimum above 0.1 as an absolute floor,
+              above 0.2 for structural applications at stress concentrations.</dd>
+
+          <dt>Aspect ratio</dt>
+          <dd>Ratio of the longest to shortest dimension of an element. Target: below 10
+              for most elements. Thin-feature elements (solder joints, TIM layers, adhesive)
+              may reach 20–30 without causing problems if the long axis is aligned with the
+              thermal or stress gradient direction.</dd>
+        </dl>
+
+        <p>
+          The Mesh Metrics histogram (View &rarr; Mesh Metrics in Mechanical) shows the
+          distribution of quality values across all elements. The distribution shape matters
+          more than the single worst element. A small number of poor elements in an otherwise
+          excellent mesh is a different situation from a mesh with a skewness distribution
+          shifted toward 0.7. Address systematic distributions, not isolated outliers.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 3.1">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Skewness above 0.9 produces unreliable results at those elements — find
+                the source feature in SpaceClaim and fix it.</li>
+            <li>Check the histogram, not just the worst value. A shifted distribution
+                indicates a systemic geometry problem, not a single bad face.</li>
+            <li>Aspect ratio is acceptable in thin features when the long axis aligns with
+                the gradient direction. A 30:1 element through a 0.1&nbsp;mm solder joint
+                is appropriate; a 30:1 element across a structural member is not.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="sizing-strategy">
+        <h2>3.2 &nbsp;Global vs. Local Sizing Strategy</h2>
+
+        <p>
+          Set the global element size coarse, then refine only where the gradient is
+          highest. A coarse global size with targeted local refinements almost always
+          outperforms a uniformly fine mesh — it preserves element count where accuracy
+          is not needed while concentrating resolution where it is.
+        </p>
+
+        <p>
+          The cost of over-refinement: element count scales as (refinement factor)&sup3; in 3D.
+          A 2&times; refinement produces 8&times; more elements. A 3&times; refinement produces
+          27&times;. Set the global size to 2–5&times; the smallest important feature, then
+          refine selectively.
+        </p>
+
+        <h3>Local refinement tools</h3>
+        <ul>
+          <li><strong>Body sizing</strong>: sets a maximum element size on a selected body.
+              Use on components that need higher accuracy than the global mesh (solder joints,
+              TIM layers, heatsink fins).</li>
+          <li><strong>Face sizing / Edge sizing</strong>: refines at specific boundary condition
+              faces or stress concentration edges (holes, fillets, mounting pad edges).</li>
+          <li><strong>Body of Influence</strong>: a virtual volume body that forces refinement
+              inside its boundary regardless of what geometry is inside. Use for regions that
+              need refinement but have no convenient face to size on.</li>
+          <li><strong>Mesh refinement</strong>: applies additional refinement passes after the
+              initial mesh. Use as a post-solve check — refine in the high-gradient region and
+              compare results to verify convergence.</li>
+        </ul>
+
+        <p>
+          The highest gradient is not always at the smallest feature. A large structural
+          member with a stress concentration at a mounting hole requires refinement at the
+          hole, not at decorative surface detail elsewhere on the body.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 3.2">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Set the global size coarse first. The first mesh is for diagnosing geometry
+                problems, not for accurate results.</li>
+            <li>Refine where the stress or thermal gradient is highest, not where the
+                geometry is most detailed.</li>
+            <li>Body of Influence is the correct tool when the high-gradient region has
+                no convenient geometry face to size on.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="mesh-methods">
+        <h2>3.3 &nbsp;Mesh Methods</h2>
+
+        <dl>
+          <dt>Patch-conforming tetrahedral (default)</dt>
+          <dd>Produces tetrahedral elements on any geometry without restriction. Works on
+              imported assemblies, complex shapes, and all geometry that Check Geometry
+              passes. The standard choice for electronics assemblies. Element accuracy per
+              element is lower than hex, but the ease of setup and robustness compensates
+              for most applications.</dd>
+
+          <dt>Multizone</dt>
+          <dd>Produces hex elements in sweepable regions and tet elsewhere. Better accuracy
+              per element for prismatic geometries — heatsink fins, connector bodies, fastener
+              standoffs. Requires the geometry to be decomposable into sweepable regions.
+              Worth the additional SpaceClaim preparation time when these components are
+              critical to the result.</dd>
+
+          <dt>Sweep</dt>
+          <dd>Structured hex through a single sweep direction. The most accurate element type
+              for thin-feature bodies: solder joints, adhesive layers, TIM, laminates. Requires
+              a simple, prismatic body (source face, target face, clean sweep path). Apply
+              selectively to the critical thin-feature bodies — not to the whole model.</dd>
+        </dl>
+
+        <p>
+          General guidance: use patch-conforming tet for the full assembly. Apply sweep or
+          multizone selectively to the components where element accuracy matters most (solder
+          joints, laminates, heatsink fins). Investing time in hex meshing for the entire
+          model rarely produces results that justify the preparation effort for electronics
+          assemblies.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 3.3">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Tetrahedral meshing is the practical choice for complex assemblies. Spend
+                time on defeaturing, not on hex meshing the entire model.</li>
+            <li>Sweep meshing on solder joints and TIM layers ensures at least 3–5 elements
+                through the thickness, which is the minimum for accurate through-thickness
+                gradient resolution.</li>
+            <li>Multizone requires sweepable geometry. If SpaceClaim did not produce a clean
+                prismatic body, multizone will fail with an error — fall back to tet.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="inflation">
+        <h2>3.4 &nbsp;Inflation Layers</h2>
+
+        <p>
+          Inflation adds layers of progressively refined elements near a surface. The purpose
+          differs between fluid and structural analyses.
+        </p>
+
+        <h3>In Icepak fluid domains</h3>
+        <p>
+          The thermal and velocity boundary layer at a solid-fluid interface has a steep
+          gradient that a coarse mesh cannot resolve. Without inflation, the near-wall
+          temperature gradient is smeared across a large element, and the convective heat
+          transfer coefficient at that surface is underestimated. Junction temperature
+          predictions are systematically low. Apply inflation to all solid-fluid interfaces
+          in Icepak fluid domains.
+        </p>
+        <p>
+          Inflation settings: first layer height calculated from the expected boundary layer
+          thickness at the relevant Reynolds number; growth rate 1.2; target 5–10 layers
+          through the boundary layer region.
+        </p>
+
+        <h3>In structural analyses</h3>
+        <p>
+          Inflation through thin structural features — solder joints, adhesive layers,
+          laminates — ensures adequate element count through the thickness. The minimum
+          for reliable through-thickness stress is three elements. Apply inflation with a
+          "total thickness" specification to fill the feature depth regardless of its
+          actual dimension.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 3.4">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>In Icepak, inflation at solid-fluid interfaces is not optional — without it
+                the near-wall heat transfer is underresolved and junction temperature
+                predictions are unreliable.</li>
+            <li>In structural analysis, inflation ensures at least 3 elements through thin
+                features. One element through a solder joint cannot resolve the bending
+                stress distribution.</li>
+            <li>Use "total thickness" inflation specification rather than a fixed number of
+                layers — it adapts to the actual feature thickness at each face.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="failure-diagnosis">
+        <h2>3.5 &nbsp;Diagnosing Mesh Failure</h2>
+
+        <p>
+          When the mesher fails, read the error message before changing anything. The message
+          window identifies the failure mode. The "Go to Problem" option in the message
+          window highlights the offending face or edge in the viewport.
+        </p>
+
+        <p>
+          Diagnostic workflow:
+        </p>
+        <ol>
+          <li>Open the message window (Home &rarr; Messages or the warning flag in the status bar).</li>
+          <li>Right-click the error &rarr; Go to Problem. The view jumps to the failing geometry.</li>
+          <li>Identify the cause: sliver face? gap? very small edge? near-zero-angle surface?</li>
+          <li>Return to SpaceClaim and fix the specific feature.</li>
+          <li>Re-generate the mesh.</li>
+        </ol>
+
+        <p>
+          Most mesh failures trace to five geometry problems: faces smaller than the target
+          element size, edges shorter than the target size, gaps between mating bodies,
+          thin slivers from import or defeaturing, and re-entrant corners at near-zero angles.
+          These are all SpaceClaim repairs, not mesh settings changes.
+        </p>
+
+        <p>
+          Do not keep adjusting mesh settings to force a failed mesh to generate. A mesh that
+          requires extreme settings to generate on broken geometry will produce poor quality
+          results at those locations regardless of whether it completes.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 3.5">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Use "Go to Problem" every time. It takes 5 seconds and eliminates guessing
+                which geometry caused the failure.</li>
+            <li>Mesh failures are almost always geometry problems. Return to SpaceClaim
+                before adjusting mesh settings.</li>
+            <li>A mesh that generates only with extreme settings (very small global size,
+                maximum smoothing) is a warning: the geometry has a problem that will
+                show up as bad elements at results review.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="references" aria-label="References">
+        <h2>References</h2>
+        <ol>
+          <li>ANSYS Inc. "Mechanical User's Guide — Meshing."
+              ANSYS Help. <a href="https://ansyshelp.ansys.com" rel="noopener">ansyshelp.ansys.com</a>
+              [login required; verify against 2025&nbsp;R2 before training delivery].</li>
+          <li>ANSYS Inc. "Icepak User's Guide — Meshing and Inflation."
+              ANSYS Help. [login required].</li>
+        </ol>
+      </section>
+
+      <nav class="phase-nav" aria-label="Phase navigation">
+        <a href="../phase-2/" class="phase-nav-btn is-prev">
+          <span class="nav-arrow" aria-hidden="true">&larr;</span>
+          <span class="nav-label">
+            <span class="nav-direction">Previous</span>
+            <span class="nav-title">Phase 2 &mdash; SpaceClaim</span>
+          </span>
+        </a>
+        <a href="../phase-4/" class="phase-nav-btn is-next">
+          <span class="nav-label">
+            <span class="nav-direction">Next</span>
+            <span class="nav-title">Phase 4 &mdash; Structural &amp; Thermal</span>
+          </span>
+          <span class="nav-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <span>ANSYS for Mechanical Engineers</span>
+      <span>ANSYS 2025 R2 &nbsp;&middot;&nbsp; Internal use</span>
+    </div>
+  </footer>
+</body>
+</html>

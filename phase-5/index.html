@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
+  <meta name="description" content="Icepak thermal CFD for electronics: model construction, compact thermal models, forced convection, parametric heatsink studies, and hardware correlation.">
+  <link rel="canonical" href="https://stembl.github.io/ansys_pe_web/phase-5/">
+  <title>Phase 5: Icepak — ANSYS for Mechanical Engineers</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body>
+  <header class="site-header" role="banner">
+    <div class="container">
+      <a href="../" class="site-logo">ANSYS Training</a>
+      <span class="version-pill">2025 R2</span>
+    </div>
+  </header>
+
+  <div class="page-wrap">
+    <nav class="sidebar" aria-label="Course navigation">
+      <span class="sidebar-label">Phases</span>
+      <ol class="nav-phases">
+        <li class="nav-phase"><a href="../phase-1/">1 &mdash; Orientation</a></li>
+        <li class="nav-phase"><a href="../phase-2/">2 &mdash; SpaceClaim</a></li>
+        <li class="nav-phase"><a href="../phase-3/">3 &mdash; Meshing</a></li>
+        <li class="nav-phase"><a href="../phase-4/">4 &mdash; Structural &amp; Thermal</a></li>
+        <li class="nav-phase is-active">
+          <a href="../phase-5/">5 &mdash; Icepak</a>
+          <ol class="nav-sub">
+            <li><a href="#icepak-orientation">5.1 Orientation</a></li>
+            <li><a href="#model-construction">5.2 Model construction</a></li>
+            <li><a href="#compact-models">5.3 CFD vs compact models</a></li>
+            <li><a href="#forced-convection">5.4 Forced convection</a></li>
+            <li><a href="#parametric-study">5.5 Parametric study</a></li>
+            <li><a href="#hardware-correlation">5.6 Hardware correlation</a></li>
+            <li><a href="#superposition">5.7 Superposition</a></li>
+          </ol>
+        </li>
+        <li class="nav-phase"><a href="../phase-6/">6 &mdash; Maxwell</a></li>
+        <li class="nav-phase"><a href="../phase-7/">7 &mdash; Multi-Physics</a></li>
+      </ol>
+    </nav>
+
+    <main class="content-main" id="main-content">
+      <nav class="breadcrumb" aria-label="Breadcrumb">
+        <a href="../">Home</a>
+        <span class="breadcrumb-sep" aria-hidden="true">/</span>
+        <span aria-current="page">Phase 5</span>
+      </nav>
+
+      <header class="phase-header">
+        <span class="phase-label">Phase 5</span>
+        <h1>Icepak</h1>
+        <p class="phase-intro">
+          Icepak solves heat transfer and fluid flow simultaneously — conjugate heat transfer.
+          It is the appropriate tool when airflow distribution affects the thermal result.
+          This phase covers the decision of when to use Icepak versus Mechanical thermal,
+          the model construction workflow, and the interpretation and validation of results.
+        </p>
+      </header>
+
+      <section class="topic" id="icepak-orientation">
+        <h2>5.1 &nbsp;When to Use Icepak vs. Mechanical Thermal</h2>
+
+        <p>
+          Mechanical Steady-State Thermal solves conduction with user-specified convection
+          coefficients at surfaces. It is appropriate when the dominant heat path is
+          conduction, and when convection can be represented as a known, uniform coefficient
+          at specific surfaces — a value from a correlation or measured data.
+        </p>
+
+        <p>
+          Icepak solves the Navier-Stokes equations coupled to the energy equation. It
+          computes the convection coefficient rather than requiring it as an input. It is
+          necessary when airflow path, velocity distribution, or enclosure geometry determines
+          which components are adequately cooled.
+        </p>
+
+        <p>
+          The decision test: does the answer depend on how much airflow reaches this specific
+          component? If yes — if the thermal result is sensitive to where air flows and at what
+          velocity — use Icepak. If the problem is "how well does heat conduct from the die
+          through the board to a heatsink," and convection can be approximated by a single
+          coefficient, use Mechanical thermal. It is faster and adequate for
+          conduction-dominated problems.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 5.1">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>The convection coefficient in Mechanical thermal is an assumption. Icepak
+                computes it. If the assumption is questionable, use Icepak.</li>
+            <li>Recirculation zones, blocked airflow paths, and component placement effects
+                on local air temperature all require Icepak to model correctly.</li>
+            <li>For heatsink effectiveness, fan selection, or vent placement decisions,
+                Icepak is the appropriate tool. Mechanical thermal cannot model these.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="model-construction">
+        <h2>5.2 &nbsp;Icepak Model Construction</h2>
+
+        <p>
+          Icepak uses a library of simplified geometry objects for most model elements:
+        </p>
+        <ul>
+          <li><strong>Cabinet</strong>: defines the enclosure boundaries and sets the control
+              volume for the CFD solve. Size it to contain the enclosure with a small
+              clearance margin.</li>
+          <li><strong>PCBs</strong>: flat plate objects with specified in-plane and
+              through-thickness thermal conductivity. FR4 conductivity is highly anisotropic:
+              much higher in-plane than through-thickness.</li>
+          <li><strong>Components</strong>: block or cylinder objects representing heat-generating
+              devices. Assign power dissipation and, where available, junction-to-case and
+              junction-to-board thermal resistance.</li>
+          <li><strong>Fans</strong>: defined by a performance curve (static pressure vs.
+              volumetric flow rate at the operating air temperature).</li>
+          <li><strong>Vents</strong>: openings defined by their free-area fraction (ratio of
+              open area to total face area).</li>
+          <li><strong>Heatsinks</strong>: available as parametric objects with defined fin
+              geometry (height, spacing, thickness).</li>
+        </ul>
+
+        <p>
+          The power budget is the most important input. Verify power values against the system
+          power budget before running. A 50% error in component power produces approximately
+          a 50% error in junction temperature. Use the object library for standard components
+          and import simplified SpaceClaim geometry only for custom or critical components.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 5.2">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Verify component power values before running. This is the single input with
+                the greatest influence on the result.</li>
+            <li>FR4 through-thickness conductivity (typically 0.3 W/m&middot;K) is 30&times;
+                lower than in-plane (typically 10–20 W/m&middot;K for copper-clad boards).
+                Do not use isotropic conductivity for PCBs.</li>
+            <li>Use the Icepak object library for standard packages. It meshes more cleanly
+                and solves faster than imported CAD for rectangular component bodies.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="compact-models">
+        <h2>5.3 &nbsp;CFD vs. Compact Thermal Models</h2>
+
+        <p>
+          A full CFD model of every component — resolving fins, die, package body, and leads —
+          is expensive and usually unnecessary. Compact thermal models replace a component
+          with a simplified resistance network that characterizes its thermal behavior without
+          modeling the internal geometry.
+        </p>
+
+        <p>
+          The JEDEC two-resistor model (JESD51-2) defines two thermal resistances: &Theta;<sub>JC</sub>
+          (junction-to-case) and &Theta;<sub>JB</sub> (junction-to-board). These are tabulated
+          in component datasheets. ANSYS Icepak includes a library of standard packages with
+          JEDEC data.
+        </p>
+
+        <p>
+          Use compact models when the component's internal thermal path is well-characterized
+          and the analysis is evaluating system-level temperature, not the component's internal
+          design. Use detailed CFD with imported geometry when the internal heat path is the
+          design variable — for example, when evaluating a new heatsink geometry, a new die
+          attach material, or a new package design.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 5.3">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Compact models are accurate for standard packages with published JEDEC data.
+                The &Theta;<sub>JC</sub> value in the datasheet is the right input — not an
+                estimate.</li>
+            <li>Two-resistor compact models are conservative for natural convection but
+                accurate for forced convection with adequate airflow over the package.</li>
+            <li>When the component's thermal performance is the variable being evaluated,
+                compact models are circular. Use detailed geometry for those components.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="forced-convection">
+        <h2>5.4 &nbsp;Forced Convection: Fans, Vents, and Airflow Path</h2>
+
+        <p>
+          <strong>Fan curve</strong>: enter the static pressure vs. volumetric flow rate
+          curve at the operating air temperature inside the enclosure. Datasheet fan curves
+          are at 25&deg;C ambient. Hot air at 60–80&deg;C is less dense and has different
+          viscosity — the fan delivers less flow at the same static pressure. Correct the
+          curve to the expected operating temperature.
+        </p>
+
+        <p>
+          <strong>Vent free-area fraction</strong>: the effective flow area is the physical
+          area multiplied by the free-area fraction. A louvered vent at 40% open area has
+          40% of the flow capacity of the same opening fully open. This value is in the
+          vent manufacturer's data. Setting it to 1.0 for a louvered vent overestimates
+          flow by 2.5&times;.
+        </p>
+
+        <p>
+          <strong>Airflow path design</strong>: identify recirculation zones — regions where
+          hot exhaust air re-enters the intake path — which reduce effective cooling.
+          Identify stagnant zones — regions where airflow velocity approaches zero — which
+          correspond to poorly cooled areas. Both appear clearly in Icepak's velocity vector
+          plots post-solve.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 5.4">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Fan curves must be entered at the operating air temperature, not at 25&deg;C.
+                Hot-air fan performance is lower than the datasheet curve.</li>
+            <li>Vent free-area fraction is the most commonly incorrect input. Louvers,
+                perforations, and grilles all have fractions below 0.6 — find the actual
+                value in the vent datasheet.</li>
+            <li>Plot velocity vectors after solving to identify recirculation and stagnant
+                zones before drawing conclusions from temperature results.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="parametric-study">
+        <h2>5.5 &nbsp;Parametric Heatsink Study</h2>
+
+        <p>
+          SpaceClaim geometry parameters (Design &rarr; Parameters) allow heatsink fin
+          dimensions to be defined as named variables that propagate into Workbench as design
+          parameters. A parameter sweep runs each geometry combination as a complete Icepak
+          solve.
+        </p>
+
+        <h3>Workflow</h3>
+        <ol>
+          <li>In SpaceClaim, define fin height, spacing, and thickness as named parameters.</li>
+          <li>Link the SpaceClaim component to Icepak in the Workbench schematic.</li>
+          <li>Open the Parameter Set view in Workbench (double-click the Parameter Set bar).</li>
+          <li>Define the parameter sweep table: combinations of fin dimensions to evaluate.</li>
+          <li>Run all design points. Workbench solves each as an independent Icepak run.</li>
+          <li>Review the Design Points table: junction temperature as a function of geometry.</li>
+        </ol>
+
+        <p>
+          Use a coarser mesh for the parametric sweep than for a final verification run. The
+          goal of the sweep is to identify the optimal geometry region, not to compute a
+          precise result at every point. Once the optimal region is identified, run one
+          fine-mesh confirmation at the optimum.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 5.5">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Each design point is a full CFD solve. A 10-point sweep is 10 full solves.
+                Set the mesh conservatively — a coarse mesh that captures the trend is
+                more useful than a fine mesh that takes hours per point.</li>
+            <li>Use the trend to identify the optimal region, then verify with one fine-mesh
+                run. Do not use coarse-mesh results as the final answer.</li>
+            <li>Fin spacing has a non-monotonic optimum: too wide reduces surface area,
+                too narrow increases pressure drop and reduces airflow. The parametric
+                sweep reveals this optimum directly.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="hardware-correlation">
+        <h2>5.6 &nbsp;Correlating Simulation to Hardware</h2>
+
+        <p>
+          Hardware measurements provide the check on the simulation model. Plan measurements
+          before running the simulation, not after — knowing what will be measured shapes
+          which model outputs to prioritize.
+        </p>
+
+        <p>
+          <strong>Thermocouples at component case</strong>: measure T<sub>case</sub>, not
+          T<sub>junction</sub>. Relate them:
+          T<sub>junction</sub> = T<sub>case</sub> + (P &times; &Theta;<sub>JC</sub>).
+          Thermocouple contact resistance makes surface readings typically 2–5&deg;C lower
+          than actual surface temperature; account for this in the comparison.
+        </p>
+
+        <p>
+          <strong>Acceptable correlation</strong>: simulation within &plusmn;5–10&deg;C of
+          measured case temperature is typical for a well-constructed model. Larger errors
+          trace to: incorrect or missing power assignments, incorrect or missing TIM
+          conductivity, incorrect fan curve, or an unmodeled heat path.
+        </p>
+
+        <p>
+          Systematic overprediction: usually a missing conduction path or an overestimated
+          power value. Systematic underprediction: usually a missing thermal resistance
+          (air gap at a component interface, dry solder joint, incorrect TIM conductivity).
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 5.6">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Plan measurement locations before the hardware build, not after.
+                Thermocouple placement that was not planned cannot be added after assembly.</li>
+            <li>Junction temperature cannot be measured directly. It is estimated from case
+                temperature plus &Theta;<sub>JC</sub> &times; power. Report the basis for the
+                junction temperature estimate alongside the measurement.</li>
+            <li>A model within 10&deg;C of hardware is well-correlated for an electronics
+                thermal model. Agreement better than 5&deg;C should be validated carefully —
+                it may reflect coincidental error cancellation rather than true accuracy.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="topic" id="superposition">
+        <h2>5.7 &nbsp;Superposition for Complex Assemblies</h2>
+
+        <p>
+          When a complete assembly is too expensive to simulate in full, temperature-rise
+          (T-rise) results from sub-assembly simulations can be combined by superposition to
+          estimate system-level temperatures.
+        </p>
+
+        <p>
+          The method: simulate sub-assemblies independently to determine T-rise per unit of
+          dissipated power (K/W) for each component. For a change in one component's power:
+          &Delta;T = &Delta;P &times; (T-rise per watt). Add to the baseline temperature.
+        </p>
+
+        <p>
+          Validity conditions: the system must be thermally linear (material properties must
+          not vary significantly with temperature over the operating range — typically valid
+          below 100&deg;C for most electronics materials), and adding or changing a component
+          must not significantly alter the airflow distribution. If the modified component
+          is a large obstacle in the airflow path, the original T-rise data was computed
+          under different flow conditions and superposition fails.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 5.7">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Superposition is valid only for linear thermal systems with
+                flow-path-independent changes. Verify both conditions before applying.</li>
+            <li>Use superposition for evaluating incremental design changes — replacing one
+                component with a higher-power variant, for example. Do not use it for
+                large architectural changes.</li>
+            <li>Superposition can significantly reduce simulation time for large assemblies
+                where the full system solve would require days. The approximation error
+                is acceptable for design trade studies.</li>
+          </ul>
+        </aside>
+      </section>
+
+      <section class="references" aria-label="References">
+        <h2>References</h2>
+        <ol>
+          <li>ANSYS Inc. "Icepak User's Guide."
+              ANSYS Help. <a href="https://ansyshelp.ansys.com" rel="noopener">ansyshelp.ansys.com</a>
+              [login required; verify against 2025&nbsp;R2 before training delivery].</li>
+          <li>JEDEC Standard JESD51-2. "Integrated Circuits Thermal Test Method Environmental
+              Conditions — Natural Convection (Still Air)." JEDEC Solid State Technology
+              Association.</li>
+        </ol>
+      </section>
+
+      <nav class="phase-nav" aria-label="Phase navigation">
+        <a href="../phase-4/" class="phase-nav-btn is-prev">
+          <span class="nav-arrow" aria-hidden="true">&larr;</span>
+          <span class="nav-label">
+            <span class="nav-direction">Previous</span>
+            <span class="nav-title">Phase 4 &mdash; Structural &amp; Thermal</span>
+          </span>
+        </a>
+        <a href="../phase-6/" class="phase-nav-btn is-next">
+          <span class="nav-label">
+            <span class="nav-direction">Next</span>
+            <span class="nav-title">Phase 6 &mdash; Maxwell</span>
+          </span>
+          <span class="nav-arrow" aria-hidden="true">&rarr;</span>
+        </a>
+      </nav>
+    </main>
+  </div>
+
+  <footer class="site-footer" role="contentinfo">
+    <div class="container">
+      <span>ANSYS for Mechanical Engineers</span>
+      <span>ANSYS 2025 R2 &nbsp;&middot;&nbsp; Internal use</span>
+    </div>
+  </footer>
+</body>
+</html>
