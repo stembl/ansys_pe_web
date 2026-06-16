@@ -9,7 +9,7 @@
    Custom properties
    -------------------------------------------------------------------------- */
 :root {
-  color-scheme: light;
+  color-scheme: light dark;
   --c-bg:           #FFFFFF;
   --c-surface:      #FFFFFF;
   --c-border:       #E2E2E2;
@@ -66,7 +66,7 @@
    Reset
    -------------------------------------------------------------------------- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 16px; -webkit-text-size-adjust: 100%; color-scheme: light; }
+html { font-size: 16px; -webkit-text-size-adjust: 100%; color-scheme: light dark; }
 
 body {
   font-family: var(--font);
@@ -682,6 +682,68 @@ sup.cite {
   align-items: center;
   justify-content: space-between;
   gap: var(--s-3);
+}
+
+/* --------------------------------------------------------------------------
+   Dark mode
+   -------------------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --c-bg:           #0F1117;
+    --c-surface:      #1A1F2E;
+    --c-border:       rgba(255,255,255,0.08);
+    --c-border-light: rgba(255,255,255,0.05);
+    --c-text:         #F1F5F9;
+    --c-text-muted:   #94A3B8;
+    --c-text-subtle:  #475569;
+    --c-primary:      #060D1A;
+    --c-accent:       #F59E0B;
+    --c-accent-hover: #D97706;
+    --c-accent-dim:   rgba(245,158,11,0.10);
+    --shadow-xs: 0 1px 2px rgba(0,0,0,0.5);
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.06);
+    --shadow-lg: 0 8px 24px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.07);
+  }
+
+  .site-header {
+    background: rgba(6, 13, 26, 0.97);
+    border-bottom-color: rgba(255,255,255,0.06);
+  }
+
+  .version-pill {
+    background: rgba(245,158,11,0.12);
+    border-color: rgba(245,158,11,0.20);
+  }
+
+  .sidebar {
+    background: #12172B;
+    border-right-color: rgba(255,255,255,0.06);
+  }
+
+  .sidebar-label { color: #334155; }
+
+  .nav-phase > a:hover { background: rgba(255,255,255,0.04); }
+
+  code {
+    background: rgba(255,255,255,0.06);
+    border-color: rgba(255,255,255,0.08);
+    color: #E2E8F0;
+  }
+
+  .data-table th { background: rgba(255,255,255,0.03); }
+
+  .data-table td { border-bottom-color: rgba(255,255,255,0.05); }
+
+  .key-points { background: rgba(245,158,11,0.08); }
+
+  .key-points-label { color: #F59E0B; }
+
+  .phase-nav-btn { border-color: rgba(255,255,255,0.10); }
+
+  .phase-nav-btn:hover { border-color: rgba(255,255,255,0.30); }
+
+  .site-footer { background: #060D1A; }
 }
 
 /* --------------------------------------------------------------------------
