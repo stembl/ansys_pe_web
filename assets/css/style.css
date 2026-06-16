@@ -159,15 +159,6 @@ a:hover { color: var(--c-accent-hover); }
   border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
-.hero-eyebrow {
-  font-size: var(--t-xs);
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--c-accent);
-  margin-bottom: var(--s-5);
-}
-
 .hero h1 {
   font-size: clamp(var(--t-3xl), 5.5vw, var(--t-4xl));
   font-weight: 700;
@@ -184,23 +175,6 @@ a:hover { color: var(--c-accent-hover); }
   color: rgba(255,255,255,0.6);
   max-width: 58ch;
   margin-bottom: var(--s-10);
-}
-
-.hero-pills {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--s-3);
-}
-
-.pill {
-  font-size: var(--t-xs);
-  font-weight: 500;
-  color: rgba(255,255,255,0.5);
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.1);
-  border-radius: 999px;
-  padding: var(--s-1) var(--s-4);
-  white-space: nowrap;
 }
 
 /* --------------------------------------------------------------------------
@@ -305,58 +279,6 @@ main { flex: 1; padding-block: var(--s-20); }
 }
 
 /* --------------------------------------------------------------------------
-   Approach section
-   -------------------------------------------------------------------------- */
-.approach {
-  background: var(--c-surface);
-  border-top: 1px solid var(--c-border-light);
-  border-bottom: 1px solid var(--c-border-light);
-  padding-block: var(--s-20);
-  margin-top: var(--s-20);
-}
-
-.steps {
-  display: grid;
-  gap: var(--s-8);
-  grid-template-columns: 1fr;
-  position: relative;
-}
-
-.step {
-  display: flex;
-  flex-direction: column;
-  gap: var(--s-4);
-}
-
-.step-number {
-  width: 2.5rem;
-  height: 2.5rem;
-  background: var(--c-accent-dim);
-  border: 1px solid rgba(217,119,6,0.2);
-  border-radius: var(--r);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: var(--t-sm);
-  font-weight: 700;
-  color: var(--c-accent);
-  flex-shrink: 0;
-}
-
-.step h3 {
-  font-size: var(--t-base);
-  font-weight: 700;
-  color: var(--c-text);
-  margin-bottom: var(--s-1);
-}
-
-.step p {
-  font-size: var(--t-sm);
-  color: var(--c-text-muted);
-  line-height: 1.65;
-}
-
-/* --------------------------------------------------------------------------
    Footer
    -------------------------------------------------------------------------- */
 .site-footer {
@@ -380,29 +302,4 @@ main { flex: 1; padding-block: var(--s-20); }
    -------------------------------------------------------------------------- */
 @media (min-width: 600px) {
   .curriculum-grid { grid-template-columns: 1fr 1fr; }
-  .steps { grid-template-columns: 1fr 1fr; }
-}
-
-/* --------------------------------------------------------------------------
-   Responsive — 800px+ (desktop)
-   -------------------------------------------------------------------------- */
-@media (min-width: 800px) {
-  .steps {
-    grid-template-columns: repeat(4, 1fr);
-    gap: var(--s-6);
-  }
-
-  /* Connecting line between step numbers */
-  .steps::before {
-    content: '';
-    position: absolute;
-    top: 1.25rem; /* vertically centered on step-number */
-    left: calc(2.5rem + var(--s-6));
-    right: calc(2.5rem + var(--s-6));
-    height: 1px;
-    background: var(--c-border);
-    z-index: 0;
-  }
-
-  .step-number { position: relative; z-index: 1; }
 }
