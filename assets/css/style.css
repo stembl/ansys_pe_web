@@ -9,6 +9,7 @@
    Custom properties
    -------------------------------------------------------------------------- */
 :root {
+  color-scheme: light;
   --c-bg:           #FFFFFF;
   --c-surface:      #FFFFFF;
   --c-border:       #E2E2E2;
@@ -65,7 +66,7 @@
    Reset
    -------------------------------------------------------------------------- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+html { font-size: 16px; -webkit-text-size-adjust: 100%; color-scheme: light; }
 
 body {
   font-family: var(--font);
