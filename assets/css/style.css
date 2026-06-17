@@ -806,16 +806,21 @@ sup.cite {
 .example-block summary::-webkit-details-marker { display: none; }
 
 .example-block summary::before {
-  content: '▶';
-  font-size: 0.65em;
+  content: '+';
+  font-size: 1em;
+  font-weight: 700;
+  line-height: 1;
   color: var(--c-accent);
-  transition: transform 0.15s;
+  transition: none;
   flex-shrink: 0;
+  width: 1em;
+  text-align: center;
 }
 
 details[open] > .example-block summary::before,
 .example-block[open] > summary::before {
-  transform: rotate(90deg);
+  content: '−';
+  transform: none;
 }
 
 details[open] > summary.example-block,
@@ -844,15 +849,20 @@ details > summary.example-summary {
 details > summary.example-summary::-webkit-details-marker { display: none; }
 
 details > summary.example-summary::before {
-  content: '▶';
-  font-size: 0.65em;
+  content: '+';
+  font-size: 1em;
+  font-weight: 700;
+  line-height: 1;
   color: var(--c-accent);
-  transition: transform 0.15s;
+  transition: none;
   flex-shrink: 0;
+  width: 1em;
+  text-align: center;
 }
 
 details[open] > summary.example-summary::before {
-  transform: rotate(90deg);
+  content: '−';
+  transform: none;
 }
 
 details > summary.example-summary:hover {
