@@ -911,6 +911,55 @@ details > summary.example-summary:hover {
 .footer-note { color: var(--c-text-subtle); }
 
 /* --------------------------------------------------------------------------
+   Learning Hub references
+   Placed after phase content, before phase-nav. Visually subordinate —
+   footnote weight, not a call-to-action.
+   -------------------------------------------------------------------------- */
+.hub-ref {
+  border-left: 2px solid var(--c-border);
+  padding: var(--s-3) 0 var(--s-3) var(--s-5);
+  margin-top: var(--s-10);
+}
+
+.hub-ref__label {
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+  display: block;
+  margin-bottom: var(--s-3);
+}
+
+.hub-ref__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+
+.hub-ref__list li {
+  font-size: var(--t-sm);
+  line-height: 1.5;
+}
+
+.hub-ref__list a {
+  color: var(--c-text-muted);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.hub-ref__list a:hover { color: var(--c-accent); }
+
+.hub-ref__meta {
+  font-size: var(--t-xs);
+  color: var(--c-text-subtle);
+  margin-left: var(--s-2);
+}
+
+/* --------------------------------------------------------------------------
    Responsive
    -------------------------------------------------------------------------- */
 @media (min-width: 600px) {

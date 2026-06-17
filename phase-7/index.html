@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Linked electromagnetic and thermal analysis, design iteration, and communicating simulation results.">
   <link rel="canonical" href="https://simulation.thehardwareos.com/phase-7/">
-  <title>Phase 7: Multi-Physics ó FEA for Power Electronics</title>
+  <title>Phase 7: Multi-Physics ù FEA for Power Electronics</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -93,7 +93,7 @@
           Connect the Maxwell Solution cell to the Icepak Setup cell. The link transfers
           the geometry, excitation definition, and the volumetric loss map (W/m&sup3;).
           Icepak uses the loss map as the distributed heat source for the conductor and
-          core bodies. The connection updates automatically when Maxwell is re-solved ó
+          core bodies. The connection updates automatically when Maxwell is re-solved ù
           but does not trigger Icepak to re-solve. The Icepak system shows "Needs Update"
           and must be re-solved explicitly. For the 20&nbsp;kHz transformer worked in section
           6.5, the full chain is Maxwell (loss map at switching frequency) &rarr; Icepak
@@ -112,7 +112,7 @@
                 error in the temperature transfer. Use them when solder joint or thin-layer
                 accuracy is required.</li>
             <li>The "Needs Update" indicator must be respected. A cell that needs update
-                contains stale results ó results on stale inputs are not current results.</li>
+                contains stale results ù results on stale inputs are not current results.</li>
           </ul>
         </aside>
       </section>
@@ -143,7 +143,7 @@
         <p>
           The rule: update from the topmost stale cell down. Never update a downstream cell
           without updating all cells above it in the chain. Doing so produces results on
-          stale upstream inputs ó the "Needs Update" indicator on the downstream cell will
+          stale upstream inputs ù the "Needs Update" indicator on the downstream cell will
           clear, but the results are not current.
         </p>
 
@@ -152,11 +152,11 @@
           After propagating an update, verify three things before reporting results:
         </p>
         <ul>
-          <li>The geometry change is visible in the downstream model ó inspect the viewer
+          <li>The geometry change is visible in the downstream model ù inspect the viewer
               to confirm the change propagated correctly.</li>
-          <li>The mesh quality is still adequate ó check metrics after re-mesh. A geometry
+          <li>The mesh quality is still adequate ù check metrics after re-mesh. A geometry
               change can introduce new sliver faces or degrade quality in the modified region.</li>
-          <li>Boundary conditions still apply to the correct faces ó a geometry change
+          <li>Boundary conditions still apply to the correct faces ù a geometry change
               can delete the face that a fixed support, heat source, or excitation was
               applied to. Missing boundary conditions do not always produce solver errors;
               they may produce silently wrong results.</li>
@@ -171,7 +171,7 @@
                 geometric change. Deleted faces silently remove the boundary condition.</li>
             <li>The version of geometry in each analysis system must be consistent.
                 A system that was not updated after a geometry change contains results
-                from a previous design ó label all results with the geometry version.</li>
+                from a previous design ù label all results with the geometry version.</li>
           </ul>
         </aside>
 
@@ -201,7 +201,7 @@
         <p>
           A simulation result presented at a design review must carry enough context to be
           interpretable and checkable. A stress contour plot without context cannot be
-          evaluated ó it is not possible to determine whether it represents a safe design
+          evaluated ù it is not possible to determine whether it represents a safe design
           without knowing what assumptions produced it. A statement such as
           &ldquo;T<sub>junction</sub> = 97&deg;C&rdquo; at a design review is not interpretable
           without stating: which FET, at what power level, at what ambient temperature, with
@@ -210,19 +210,19 @@
 
         <h3>Minimum required context for any simulation result</h3>
         <ul>
-          <li><strong>ANSYS version</strong> ó which solver version produced the result.</li>
-          <li><strong>Analysis type</strong> ó e.g., "Steady-state thermal with JEDEC compact
+          <li><strong>ANSYS version</strong> ù which solver version produced the result.</li>
+          <li><strong>Analysis type</strong> ù e.g., "Steady-state thermal with JEDEC compact
               component models; forced convection not modeled."</li>
-          <li><strong>Material assumptions</strong> ó any non-default or estimated material
+          <li><strong>Material assumptions</strong> ù any non-default or estimated material
               properties, e.g., "FR4 through-thickness conductivity assumed 0.3&nbsp;W/m&middot;K."</li>
-          <li><strong>Boundary condition summary</strong> ó how constrained, where loads applied,
+          <li><strong>Boundary condition summary</strong> ù how constrained, where loads applied,
               what convection coefficient or CFD boundary was used.</li>
-          <li><strong>Mesh quality</strong> ó worst-case skewness and orthogonal quality; or,
+          <li><strong>Mesh quality</strong> ù worst-case skewness and orthogonal quality; or,
               if mesh convergence was verified, state the refinement ratio and the change in the
               result quantity.</li>
-          <li><strong>Key assumptions</strong> ó any simplification of reality: no radiation,
+          <li><strong>Key assumptions</strong> ù any simplification of reality: no radiation,
               no contact resistance, uniform power, symmetric model, etc.</li>
-          <li><strong>Known limitations</strong> ó what the model does not capture that could
+          <li><strong>Known limitations</strong> ù what the model does not capture that could
               affect the conclusion.</li>
         </ul>
 
@@ -237,7 +237,7 @@
         <h3>Exporting results</h3>
         <ul>
           <li><strong>Images</strong>: use the ANSYS result plots directly. Label each with
-              result type, units, and scale range. Set the scale range explicitly ó the auto-scale
+              result type, units, and scale range. Set the scale range explicitly ù the auto-scale
               compresses to the data range and may hide gradients that are important at the
               design limit.</li>
           <li><strong>Reports</strong>: Mechanical &rarr; Solution &rarr; Report Preview
@@ -252,15 +252,31 @@
             <li>A result without a stated analysis type, version, and key assumptions cannot
                 be evaluated. Present the context, not just the contour.</li>
             <li>Set result scale ranges explicitly for design review images. Auto-scale
-                optimizes visual contrast, not engineering relevance ó a yellow contour
+                optimizes visual contrast, not engineering relevance ù a yellow contour
                 at 150&deg;C and at 55&deg;C look identical on auto-scale.</li>
             <li>State what the model does not capture. A thermal model without radiation
-                overpredicts temperature in a radiation-cooled region ó stating this gives
+                overpredicts temperature in a radiation-cooled region ù stating this gives
                 reviewers the information to assess conservatism.</li>
           </ul>
         </aside>
       </section>
 
+
+      <aside class="hub-ref" aria-label="Ansys Learning Hub references">
+        <span class="hub-ref__label">Ansys Learning Hub ó recommended courses</span>
+        <ul class="hub-ref__list">
+          <li>
+            <a href="https://learninghub.ansys.com/learn/external-ecommerce;view=none;redirectURL=?ctldoc-catalog-0=se-ETM%20Maxwell%20Icepak"
+               target="_blank" rel="noopener">Electrothermal Management (ETM) using Ansys Maxwell and Icepak</a>
+            <span class="hub-ref__meta">2&nbsp;hr &middot; E-learning &middot; &#9733;5 &middot; search: "Electrothermal Management ETM Maxwell Icepak" at learninghub.ansys.com</span>
+          </li>
+          <li>
+            <a href="https://learninghub.ansys.com/learn/external-ecommerce;view=none;redirectURL=?ctldoc-catalog-0=se-IcepakFEA"
+               target="_blank" rel="noopener">Electro-Thermal and Thermo-Mechanical Analysis using IcepakFEA</a>
+            <span class="hub-ref__meta">8&nbsp;hr &middot; E-learning &middot; &#9733;5 &middot; search: "IcepakFEA Electro-Thermal Thermo-Mechanical" at learninghub.ansys.com</span>
+          </li>
+        </ul>
+      </aside>
 
       <nav class="phase-nav" aria-label="Phase navigation">
         <a href="../phase-6/" class="phase-nav-btn is-prev">
