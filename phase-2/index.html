@@ -92,7 +92,10 @@
           When imported geometry is unreliable, building the simulation model in SpaceClaim
           from scratch is faster than repairing it. For simple parts with clean CAD history,
           import is fine. For complex assemblies with tight tolerances or critical mating
-          surfaces, build what you need directly.
+          surfaces, build what you need directly. A cast-aluminium heatsink, for example,
+          often imports cleanly at the fin surfaces but has a 0.05&nbsp;mm gap at the
+          fin-to-base junction that is invisible visually and only surfaces when the mesher
+          tries to create conformal elements across it.
         </p>
 
         <aside class="key-points" aria-label="Key points for 2.1">
@@ -149,6 +152,18 @@
                 element size everywhere near it, not just at that feature.</li>
           </ul>
         </aside>
+
+        <aside class="example-note" aria-label="Example: cast-Al heatsink assembly">
+          <span class="example-note-label">Practical example &mdash; cast-Al heatsink assembly</span>
+          <p>A cast-aluminium heatsink with 35&nbsp;mm fins at 5&nbsp;mm pitch. Mesh-hostile
+            features found in inspection: (1)&nbsp;fin-root fillets of 0.18&nbsp;mm &mdash; below
+            the threshold where the mesher can reliably create transition elements; (2)&nbsp;a
+            0.12&nbsp;mm sliver face at the junction between two adjacent fins where the die-cast
+            parting line left a small step; (3)&nbsp;a near-tangent angle of 2.3&deg; where the
+            fin sidewall meets the base plate, forcing high aspect-ratio transition elements.</p>
+          <p>None of these appeared in Check Geometry. All three were found by visual inspection
+            at high zoom and confirmed by examining the skewness histogram after the first mesh pass.</p>
+        </aside>
       </section>
 
       <section class="topic" id="defeature-structural">
@@ -188,6 +203,20 @@
                 application points, and all features at known stress concentrations.</li>
           </ul>
         </aside>
+
+        <aside class="example-note" aria-label="Example: wall-mount bracket">
+          <span class="example-note-label">Practical example &mdash; wall-mount bracket</span>
+          <p>A cast-aluminium wall-mount bracket for a 30&nbsp;kg enclosure. Four M8 mounting
+            holes carry the gravity and seismic loads. The bracket has decorative machined channels
+            on the front face (cosmetic), draft angle chamfers on all vertical surfaces
+            (manufacturing), and 0.5&nbsp;mm fillets on the decorative channels (cosmetic).</p>
+          <p>Removed: decorative channels, draft chamfers, 0.5&nbsp;mm cosmetic fillets &mdash;
+            all remote from the load path. Retained: 3&nbsp;mm fillets at the M8 hole faces
+            (in the stress concentration path &mdash; removing them creates an artificial
+            singularity), and the full back-plate contact geometry (the constraint is applied here).
+            Element count after defeaturing: 38,000 vs 142,000 for the fully featured model. Peak
+            stress at the M8 holes: within 1.8% between both.</p>
+        </aside>
       </section>
 
       <section class="topic" id="defeature-thermal">
@@ -225,6 +254,20 @@
             <li>Face-to-face contact at every conduction interface. A small gap at a component
                 footprint is the most common cause of overpredicted junction temperature.</li>
           </ul>
+        </aside>
+
+        <aside class="example-note" aria-label="Example: battery backup enclosure">
+          <span class="example-note-label">Practical example &mdash; battery backup enclosure</span>
+          <p>An enclosure with internal PCBs, battery modules, and a heatsink. For the Icepak
+            model: battery module internal geometry (cells, tabs, busbars) replaced with effective
+            anisotropic conductivity blocks; PCB internal trace geometry replaced with effective
+            in-plane conductivity; cable harnesses suppressed (not in the primary thermal path
+            and create meshing difficulties); air volume created via Fill, producing a single body
+            for all enclosed airspace.</p>
+          <p>Risk to document: removed internal features could block airflow in hardware that the
+            simulation missed. Any geometry simplification that affects the airflow path should be
+            explicitly noted in the analysis assumptions with a statement of the potential impact
+            on the result.</p>
         </aside>
       </section>
 
@@ -270,6 +313,20 @@
             <li>Winding cross-section shape (round vs. rectangular) matters less than winding
                 area and position. Simplify to rectangular for cleaner meshing.</li>
           </ul>
+        </aside>
+
+        <aside class="example-note" aria-label="Example: meter housing conductor">
+          <span class="example-note-label">Practical example &mdash; meter housing conductor</span>
+          <p>A utility meter housing with two current-carrying conductors of circular cross-section
+            (12&nbsp;mm diameter, 180&nbsp;mm long). Maxwell DC conduction analysis. Air region:
+            box extending 3&times; the conductor length in all principal directions. Air region
+            sensitivity check: inductance at 3&times; vs 5&times; clearance differed by 1.4% &mdash;
+            3&times; is adequate for this geometry.</p>
+          <p>Conductor cross-sections simplified from round to equivalent-area rectangles
+            (same 113&nbsp;mm&sup2; cross-section area). Current density at corners of the
+            rectangular approximation is 8% higher than the round conductor result at the same
+            location. Integrated total loss differs by 2.3% &mdash; acceptable for engineering
+            accuracy in loss estimation.</p>
         </aside>
       </section>
 
@@ -334,6 +391,13 @@
                 resort for exterior-only thermal analysis — not as a default cleanup step.</li>
           </ul>
         </aside>
+
+        <p>
+          After running this sequence on a heatsink assembly, for example, the mesh quality
+          histogram typically shifts the mean skewness from 0.42 (post-import) to 0.17
+          (post-repair) &mdash; a systematic improvement from removing the sliver faces and
+          unmerged coplanar faces that import left behind.
+        </p>
       </section>
 
 

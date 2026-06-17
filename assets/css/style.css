@@ -595,6 +595,33 @@ code {
   background: var(--c-accent);
 }
 
+/* Annotated example note (tier: 3.0–3.9) */
+.example-note {
+  border-left: 3px solid var(--c-text-muted);
+  border-radius: 0 var(--r) var(--r) 0;
+  padding: var(--s-5) var(--s-6);
+  margin-top: var(--s-8);
+  background: var(--c-border-light);
+}
+
+.example-note-label {
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+  display: block;
+  margin-bottom: var(--s-3);
+}
+
+.example-note p {
+  font-size: var(--t-sm);
+  color: var(--c-text);
+  line-height: 1.7;
+  margin-bottom: var(--s-3);
+}
+.example-note p:last-child { margin-bottom: 0; }
+
 /* Citations */
 sup.cite {
   font-size: 0.7em;

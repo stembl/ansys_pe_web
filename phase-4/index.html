@@ -125,6 +125,12 @@
                 interfaces. Frictionless contact between bonded parts is a modeling error.</li>
           </ul>
         </aside>
+
+        <aside class="example-note" aria-label="Example: wall-mount bracket setup">
+          <span class="example-note-label">Practical example &mdash; wall-mount bracket</span>
+          <p>A 30&nbsp;kg enclosure on a cast-aluminium wall-mount bracket with four M8 through-bolts. Loading: gravity (441&nbsp;N downward), lateral seismic load per ASCE&nbsp;7-16 zone&nbsp;2, I<sub>p</sub>=1.0 (0.36<em>g</em> = 106&nbsp;N), and wind at 1.5&nbsp;kPa on the projected face area (0.12&nbsp;m&sup2; = 180&nbsp;N). Boundary conditions: Fixed Support at the four M8 hole cylindrical faces. Remote Point at the enclosure centre of mass (535&nbsp;mm above the bracket top): gravity applied as body Acceleration at the Remote Point, lateral loads applied as Force components.</p>
+          <p>Reaction force check: sum of reactions at the four hole faces in the vertical direction = 441&nbsp;N. Matches the applied gravity load. If the reaction force check fails &mdash; for example, if the sum is 660&nbsp;N &mdash; the model has a duplicate load or an incorrect constraint and the result should not be interpreted before finding the error.</p>
+        </aside>
       </section>
 
       <section class="topic" id="static-results">
@@ -173,6 +179,12 @@
                 and displacement limits at connectors and mounting interfaces.</li>
           </ul>
         </aside>
+
+        <aside class="example-note" aria-label="Example: wall-mount bracket results">
+          <span class="example-note-label">Practical example &mdash; wall-mount bracket results</span>
+          <p>For the bracket under gravity + seismic + wind: peak Von Mises stress = 78&nbsp;MPa at the upper-left M8 hole fillet. Cast A380 aluminium yield strength: 159&nbsp;MPa. Safety factor = 159/78 = 2.04. Adequate for static loading. When the M8 hole fillet was not modeled (a perfectly sharp corner), the same mesh produced 212&nbsp;MPa &mdash; above yield. Mesh refinement at this location showed the result increasing without converging: a singularity. Adding a 0.3&nbsp;mm fillet (minimum machined radius) brought the peak to 78&nbsp;MPa, which then converged on refinement.</p>
+          <p>Total deformation at the enclosure centre of mass: 0.34&nbsp;mm. The nearest connector clearance is 8&nbsp;mm &mdash; deformation is not a secondary failure concern. Both stress margin and deformation must be checked before declaring adequacy.</p>
+        </aside>
       </section>
 
       <section class="topic" id="modal">
@@ -220,6 +232,21 @@
                 random vibration results.</li>
           </ul>
         </aside>
+
+        <details class="example-block">
+          <summary>Example &mdash; inverter PCB assembly: reading mode shapes to predict failure location</summary>
+          <div class="example-content">
+            <p>A 220&nbsp;mm &times; 150&nbsp;mm PCB with two M4 bolt constraints at opposite corners and a 180&nbsp;g power module at the centre. PCB: 2&nbsp;mm FR4. Extract 12 modes.</p>
+            <p>Setup: Fixed Supports at the two M4 bolt hole faces. No loads required &mdash; modal is a free-vibration problem.</p>
+            <p>Results:</p>
+            <ol>
+              <li><strong>Mode 1 at 47&nbsp;Hz:</strong> dominant motion is out-of-plane board flexure. Maximum mode-shape amplitude is at the power module location. If the vibration environment contains energy near 47&nbsp;Hz (typical for shipping profiles), the board flexes at the centre &mdash; the power module solder joints see the highest bending-induced strain.</li>
+              <li><strong>Mode 2 at 112&nbsp;Hz:</strong> second flexural mode with a node line through the centre. Maximum amplitude shifts to the PCB quadrants between the bolts and the module. Mode 1 is more critical for the module joints; Mode 2 affects the discrete components in the board quadrants.</li>
+              <li><strong>Mode count check:</strong> subsequent random vibration spectrum goes to 2000&nbsp;Hz &rarr; modes required to at least 3000&nbsp;Hz (1.5&times;). Mode 12 reaches 3100&nbsp;Hz. Adequate. If the 12th mode had reached only 1800&nbsp;Hz, more modes would be required before the random vibration solve.</li>
+            </ol>
+            <p>The mode shape, not the frequency, is the most useful result for determining where to focus solder joint fatigue assessment. A mode at 200&nbsp;Hz that concentrates deflection at the module is more damaging than a mode at 40&nbsp;Hz that concentrates deflection at a low-mass area.</p>
+          </div>
+        </details>
       </section>
 
       <section class="topic" id="random-vibration">
@@ -267,6 +294,29 @@
                 "stress = X MPa" is not.</li>
           </ul>
         </aside>
+
+        <details class="example-block">
+          <summary>Example &mdash; inverter PCB assembly: transportation vibration assessment using ISTA 2A</summary>
+          <div class="example-content">
+            <p>Continuing from the modal example above. PSD input: ISTA 2A profile for package weights 10&ndash;68&nbsp;kg (enclosure with PCB inside), applied in the vertical axis (worst case for board flexure).</p>
+            <p>PSD profile used (representative key breakpoints):</p>
+            <ul>
+              <li>5&nbsp;Hz: 0.0001&nbsp;G&sup2;/Hz</li>
+              <li>25&nbsp;Hz: 0.004&nbsp;G&sup2;/Hz (plateau starts)</li>
+              <li>100&nbsp;Hz: 0.004&nbsp;G&sup2;/Hz</li>
+              <li>500&nbsp;Hz: 0.0001&nbsp;G&sup2;/Hz</li>
+            </ul>
+            <p>Setup: link the Modal system upstream. Apply the PSD table as base excitation at the two bolt hole supports. Run vertical axis as the primary concern.</p>
+            <p>Results (1-sigma output, Scale Factor = 1 in Mechanical):</p>
+            <ul>
+              <li>1-sigma Von Mises at power module solder joints: 14.2&nbsp;MPa</li>
+              <li>3-sigma (Scale Factor = 3): 42.6&nbsp;MPa</li>
+              <li>Eutectic Sn63/Pb37 solder fatigue limit at 25&nbsp;Hz: approximately 18&ndash;22&nbsp;MPa at 10<sup>7</sup> cycles</li>
+            </ul>
+            <p>Interpretation: the 3-sigma result (42.6&nbsp;MPa) exceeds the solder fatigue limit. The joint is predicted to accumulate fatigue damage during the ISTA 2A test duration. Two options: add a third mounting bolt near the power module (reduces the PCB deflection amplitude at Mode 1), or specify vibration-rated solder paste for the power module joints (higher fatigue limit).</p>
+            <p>Reported result: <em>&ldquo;3-sigma Von Mises at power module solder joints: 42.6&nbsp;MPa vs. 18&nbsp;MPa fatigue limit (2.4&times; overstress). Analysis per ISTA 2A profile, ANSYS Mechanical Random Vibration, 12 modes to 3100&nbsp;Hz.&rdquo;</em></p>
+          </div>
+        </details>
       </section>
 
       <section class="topic" id="thermal-structural">
@@ -319,6 +369,26 @@
                 dominant thermal stress driver at solder joints.</li>
           </ul>
         </aside>
+
+        <details class="example-block">
+          <summary>Example &mdash; power module solder joints: CTE mismatch stress at operating temperature</summary>
+          <div class="example-content">
+            <p>A power module (30&nbsp;mm &times; 30&nbsp;mm footprint) soldered to a 2&nbsp;mm FR4 PCB. Operating condition: module junction at 85&deg;C, PCB bottom surface at 50&deg;C (heatsink attached below).</p>
+            <p>Steady-State Thermal setup:</p>
+            <ol>
+              <li>Geometry: module body + PCB + 0.1&nbsp;mm solder joint layer. Share topology in SpaceClaim for conformal mesh at all interfaces.</li>
+              <li>Thermal BCs: surface heat flux at module top face (die area) = 1.2&nbsp;W/cm&sup2;. Convection at PCB bottom face: h = 1500&nbsp;W/m&sup2;K (from Icepak forced-convection result at the heatsink surface).</li>
+              <li>Solve: temperature field ranges from 50&deg;C at the PCB bottom to 85&deg;C at the module die.</li>
+            </ol>
+            <p>Static Structural setup (thermal-structural link):</p>
+            <ol>
+              <li>Import temperature field: Solution &rarr; Insert &rarr; Thermal Condition. Verify the temperature plot in the structural model shows the imported gradient (not a uniform room-temperature field, which would indicate a broken link).</li>
+              <li>Reference temperature: 260&deg;C (lead-free solder reflow). The joints are stress-free at reflow; the analysis computes stress accumulated as the assembly cools to operating temperature.</li>
+              <li>Supports: Fixed at the heatsink mounting bolt locations. Free thermal expansion in the out-of-plane direction.</li>
+            </ol>
+            <p>Results: peak Von Mises at the outer corners of the solder fillet = 28&nbsp;MPa. The corner joints experience the highest stress because the distance from the neutral point (CTE offset) is largest there. The CTE mismatch between the copper module base (17&nbsp;ppm/&deg;C) and FR4 laminate (15&nbsp;ppm/&deg;C in-plane) across a 210&deg;C temperature swing from reflow to operating state drives the result.</p>
+          </div>
+        </details>
       </section>
 
       <section class="topic" id="plastic">
@@ -371,6 +441,12 @@
             <li>Identify yielded regions by plotting equivalent plastic strain. Non-zero
                 plastic strain indicates permanent deformation under the applied load.</li>
           </ul>
+        </aside>
+
+        <aside class="example-note" aria-label="Example: wall-mount bracket under seismic overload">
+          <span class="example-note-label">Practical example &mdash; wall-mount bracket under seismic overload</span>
+          <p>Seismic zone&nbsp;4 scenario (1.0<em>g</em> lateral, ASCE&nbsp;7-16 I<sub>p</sub>=1.5 essential facility): lateral load = 441&nbsp;N. Linear elastic prediction: peak Von Mises = 198&nbsp;MPa, which exceeds cast A380 yield strength of 159&nbsp;MPa at the M8 hole fillet. The elastic result identifies the yield zone but does not give the post-yield stress distribution.</p>
+          <p>Nonlinear re-analysis with BISO material (yield strength = 159&nbsp;MPa, tangent modulus = 1.2&nbsp;GPa from datasheet): equivalent plastic strain at M8 fillet = 0.008 (0.8%). The plastic zone is localised to a 3&nbsp;mm region around the fillet &mdash; the rest of the bracket remains elastic. The 0.8% plastic strain is within the material elongation-at-break specification (3.5%). Documented conclusion: <em>&ldquo;local yielding at M8 fillet under extreme seismic; bracket does not fail. Plastic strain within material elongation spec.&rdquo;</em></p>
         </aside>
       </section>
 
@@ -507,6 +583,20 @@
                 is a singularity, not a real stress. Add a fillet in SpaceClaim.</li>
           </ul>
         </aside>
+
+        <details class="example-block">
+          <summary>Example &mdash; PCB-to-heatsink assembly: diagnosing and fixing contact instability</summary>
+          <div class="example-content">
+            <p>A PCB bolted to an aluminium heatsink through a 0.5&nbsp;mm TIM pad, four M3 corner bolts. The nonlinear solve with frictional contact at the TIM interface diverges after substep&nbsp;3 of&nbsp;10.</p>
+            <p>Diagnosis:</p>
+            <ol>
+              <li><strong>Read the convergence plot:</strong> Solution Information &rarr; Force Convergence. Substeps 1&ndash;2 converge normally (residual falls below 0.5% criterion). Substep 3: the residual oscillates between 8% and 12% over 15 iterations without converging. This is the contact chattering signature &mdash; the TIM contact pair is opening and closing between iterations as thermal expansion loads the interface.</li>
+              <li><strong>Fix 1 &mdash; Adjust to Touch:</strong> change the TIM contact pair initial state from &ldquo;Program Controlled&rdquo; to &ldquo;Adjust to Touch.&rdquo; This eliminates any initial penetration or gap at the TIM faces, preventing the first iteration from creating a large contact discontinuity. Re-run: substep 3 converges in 4 iterations.</li>
+              <li><strong>Fix 2 &mdash; increase substeps (if needed):</strong> if chattering persists after Adjust to Touch, increase substeps from 10 to 30 (Analysis Settings &rarr; Number of Substeps &rarr; Maximum = 30). Smaller load increments reduce the contact force jump per substep. This is the correct next step, not changing the material model.</li>
+            </ol>
+            <p>Post-convergence check: sum of reaction forces at the four M3 bolt supports. The sum should equal the thermal expansion force at the TIM interface (calculable from CTE &times; &Delta;T &times; area &times; modulus). If reactions do not balance, a contact pair is missing or the model is under-constrained, and the solution is wrong regardless of converging successfully.</p>
+          </div>
+        </details>
       </section>
 
       <section class="references" aria-label="References">

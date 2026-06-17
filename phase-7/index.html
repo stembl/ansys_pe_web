@@ -94,7 +94,11 @@
           Icepak uses the loss map as the distributed heat source for the conductor and
           core bodies. The connection updates automatically when Maxwell is re-solved —
           but does not trigger Icepak to re-solve. The Icepak system shows "Needs Update"
-          and must be re-solved explicitly.
+          and must be re-solved explicitly. For the 20&nbsp;kHz transformer worked in section
+          6.5, the full chain is Maxwell (loss map at switching frequency) &rarr; Icepak
+          (thermal solve with distributed heat source) &rarr; Mechanical Structural
+          (CTE stress driven by the Icepak temperature field) &mdash; three solvers, one
+          SpaceClaim geometry source, updated in sequence.
         </p>
 
         <aside class="key-points" aria-label="Key points for 7.1">
@@ -169,6 +173,25 @@
                 from a previous design — label all results with the geometry version.</li>
           </ul>
         </aside>
+
+        <details class="example-block">
+          <summary>Example &mdash; inverter assembly: propagating a switching frequency change through the full chain</summary>
+          <div class="example-content">
+            <p>An inverter initially designed at 15&nbsp;kHz. A design change increases the switching frequency to 20&nbsp;kHz to reduce filter inductor size. The full analysis chain: Maxwell &rarr; Icepak &rarr; Mechanical Structural.</p>
+            <ol>
+              <li><strong>Maxwell re-solve at 20&nbsp;kHz:</strong> transformer winding AC losses increase from 0.62&nbsp;W to 0.78&nbsp;W (+26% &mdash; smaller skin depth at 20&nbsp;kHz concentrates current more). Core losses increase from 0.41&nbsp;W to 0.54&nbsp;W (P<sub>core</sub> &prop; f<sup>1.25</sup> for N87). Total transformer loss: 1.32&nbsp;W vs 1.03&nbsp;W at 15&nbsp;kHz. Maxwell shows &ldquo;Up to Date.&rdquo;</li>
+              <li><strong>Icepak &mdash; Needs Update:</strong> the Maxwell &rarr; Icepak loss link marks Icepak as needing update. No geometry change &mdash; only heat source values changed. The transformer mesh does not need regeneration; only the heat source magnitudes update when Icepak is re-solved.</li>
+              <li><strong>Icepak re-solve:</strong> transformer body T-rise increases by 9&deg;C due to the additional 0.29&nbsp;W. Peak transformer winding temperature: 88&deg;C &rarr; 97&deg;C. FET temperatures are unchanged (their losses did not change with frequency).</li>
+              <li><strong>Mechanical &mdash; Needs Update:</strong> higher transformer temperature increases CTE-driven solder joint stress at the transformer mount. Re-solve: stress at the transformer solder joints increases by 4&nbsp;MPa.</li>
+            </ol>
+            <p><strong>Post-change validation:</strong></p>
+            <ul>
+              <li>Boundary conditions still target valid geometry: no geometry change occurred, so all BCs remain attached to the correct faces.</li>
+              <li>Mesh quality: unchanged (no geometry modification).</li>
+              <li>Decision: 9&deg;C transformer temperature rise is acceptable (97&deg;C vs 105&deg;C limit). 4&nbsp;MPa solder stress increase is within margin. Frequency change is approved.</li>
+            </ul>
+          </div>
+        </details>
       </section>
 
       <section class="topic" id="result-communication">
@@ -178,7 +201,10 @@
           A simulation result presented at a design review must carry enough context to be
           interpretable and checkable. A stress contour plot without context cannot be
           evaluated — it is not possible to determine whether it represents a safe design
-          without knowing what assumptions produced it.
+          without knowing what assumptions produced it. A statement such as
+          &ldquo;T<sub>junction</sub> = 97&deg;C&rdquo; at a design review is not interpretable
+          without stating: which FET, at what power level, at what ambient temperature, with
+          what airflow, and whether the TIM conductivity was measured or assumed.
         </p>
 
         <h3>Minimum required context for any simulation result</h3>

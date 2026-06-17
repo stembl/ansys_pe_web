@@ -109,6 +109,20 @@
                 is appropriate; a 30:1 element across a structural member is not.</li>
           </ul>
         </aside>
+
+        <aside class="example-note" aria-label="Example: inverter PCB assembly">
+          <span class="example-note-label">Practical example &mdash; inverter PCB assembly</span>
+          <p>A PCB assembly with 200 components, modeled as a flat board plus six block objects
+            for the power modules. First mesh at 2&nbsp;mm global size: 340,000 elements. Skewness
+            histogram: mean 0.18, maximum 0.94. The worst bin (0.85&ndash;0.95) contains 28 elements.
+            Selecting those elements in the histogram highlights them at the PCB edge where a
+            connector tab extends 0.4&nbsp;mm below the board surface &mdash; a geometry artifact
+            from the STEP import. Orthogonal quality minimum: 0.11 at the same location.</p>
+          <p>After removing the connector tab (not in the structural load path), the maximum
+            skewness drops to 0.62 and the minimum orthogonal quality rises to 0.38. Both metrics
+            now indicate an acceptable mesh. The histogram identified the problem body in under
+            30 seconds.</p>
+        </aside>
       </section>
 
       <section class="topic" id="sizing-strategy">
@@ -160,6 +174,21 @@
                 no convenient geometry face to size on.</li>
           </ul>
         </aside>
+
+        <details class="example-block">
+          <summary>Example &mdash; wall-mount bracket: targeting refinement to the mounting holes</summary>
+          <div class="example-content">
+            <p>A wall-mount bracket for a 30&nbsp;kg enclosure: 400&nbsp;mm &times; 200&nbsp;mm &times; 6&nbsp;mm cast aluminium with four M8 mounting holes at the corners and a central cable pass-through slot.</p>
+            <p>Sizing strategy:</p>
+            <ol>
+              <li><strong>Global size: 8&nbsp;mm.</strong> Gives one element through the bracket thickness. Covers all geometry. Element count: ~18,000. Goal is geometry problem detection, not accurate results.</li>
+              <li><strong>Face sizing at the four M8 hole edges: 1&nbsp;mm.</strong> These are the highest-stress locations under the gravity + seismic load &mdash; the constraint is applied here and the stress gradient is steepest at the hole boundary.</li>
+              <li><strong>Body of Influence around each hole: 10&nbsp;mm sphere, 2&nbsp;mm size.</strong> Transitions the 1&nbsp;mm hole mesh to the 8&nbsp;mm global mesh over a short distance, without requiring manual face sizing on every adjacent face.</li>
+              <li><strong>No refinement at the cable slot.</strong> The slot is remote from the load path (the mounting holes carry all reaction force) and the slot edge stress is not a design-limiting quantity.</li>
+            </ol>
+            <p>Result: targeted mesh has 42,000 elements vs 310,000 elements for a uniform 1&nbsp;mm mesh. Peak stress at the mounting holes differs by less than 3% between the two meshes. The targeted approach is 7&times; faster to solve with equivalent accuracy at the critical location.</p>
+          </div>
+        </details>
       </section>
 
       <section class="topic" id="mesh-methods">
@@ -207,6 +236,17 @@
                 prismatic body, multizone will fail with an error — fall back to tet.</li>
           </ul>
         </aside>
+
+        <details class="example-block">
+          <summary>Example &mdash; heatsink fins and meter housing conductors: matching method to geometry</summary>
+          <div class="example-content">
+            <p>Two components that benefit from non-default meshing:</p>
+            <p><strong>Heatsink fins (cast-Al, 40&nbsp;mm high, 1.5&nbsp;mm thick, 5&nbsp;mm pitch):</strong> the fin body is prismatic &mdash; a constant cross-section swept along the fin height. Apply Multizone to the fin bodies. The result is hex elements aligned with the fin height direction, which is also the primary thermal gradient direction. Hex elements aligned with the gradient require approximately 60% fewer elements than tet to achieve the same gradient resolution in the fin cross-section.</p>
+            <p><strong>Meter housing conductors (circular cross-section, 12&nbsp;mm diameter):</strong> round conductors mesh poorly with tet &mdash; the circular cross-section produces high aspect-ratio elements near the centre. Apply Sweep using the circular face as the source. The sweep generates hex elements aligned with the current flow direction (axially), which is also the direction of the current density gradient in the DC conduction solve.</p>
+            <p><strong>Assembly body:</strong> patch-conforming tet for the housing, fasteners, and air region. These have complex imported geometry that is not sweepable.</p>
+            <p>Element count comparison for one conductor cross-section: patch-conforming tet produces ~1,200 elements at worst-case skewness 0.71. Sweep produces 480 elements at skewness 0.02 &mdash; 2.5&times; fewer elements and 35&times; better quality at the same conductor body.</p>
+          </div>
+        </details>
       </section>
 
       <section class="topic" id="inflation">
@@ -254,6 +294,21 @@
                 layers — it adapts to the actual feature thickness at each face.</li>
           </ul>
         </aside>
+
+        <details class="example-block">
+          <summary>Example &mdash; heatsink CFD domain: inflation settings for forced convection</summary>
+          <div class="example-content">
+            <p>A cast-Al heatsink: fins 40&nbsp;mm high, 1.5&nbsp;mm thick, 5&nbsp;mm pitch. Forced convection at 2&nbsp;m/s inlet velocity. Hydraulic diameter of a fin channel: D<sub>h</sub> = 2 &times; (1.5 &times; 3.5)/(1.5 + 3.5) = 2.1&nbsp;mm. Re &asymp; 290 &mdash; laminar flow.</p>
+            <p>Inflation setup at the fin surfaces:</p>
+            <ol>
+              <li><strong>First layer height: 0.05&nbsp;mm.</strong> Targets y<sup>+</sup> &asymp; 1 for laminar near-wall resolution. The thermal boundary layer in a 2&nbsp;m/s, 40&nbsp;mm long fin channel is developing and thin &mdash; the first layer must be inside the viscous sublayer.</li>
+              <li><strong>Growth rate: 1.2.</strong> Each layer is 1.2&times; the previous. Conservative enough to avoid quality problems at the transition to the bulk mesh.</li>
+              <li><strong>Number of layers: 8.</strong> The eighth layer reaches approximately 0.22&nbsp;mm, at which point the bulk mesh elements are 1&nbsp;mm. Aspect ratio at the last inflation layer: ~4.5. Acceptable.</li>
+              <li><strong>Applied to:</strong> all fin faces, fin tips, and heatsink base plate &mdash; all solid-fluid interfaces.</li>
+            </ol>
+            <p>Without inflation at these settings, the near-wall temperature gradient is smeared over the first 1&nbsp;mm element. The computed heat transfer coefficient at the fin surface is underestimated by approximately 30&ndash;40%, and junction temperature predictions are correspondingly non-conservative.</p>
+          </div>
+        </details>
       </section>
 
       <section class="topic" id="failure-diagnosis">
@@ -300,6 +355,21 @@
                 maximum smoothing) is a warning: the geometry has a problem that will
                 show up as bad elements at results review.</li>
           </ul>
+        </aside>
+
+        <aside class="example-note" aria-label="Example: heatsink assembly mesh failure">
+          <span class="example-note-label">Practical example &mdash; heatsink assembly</span>
+          <p>The mesh fails with: &ldquo;Unable to generate tetrahedral mesh &mdash; body volume
+            is near zero or geometry is degenerate at marked location.&rdquo; Go to Problem
+            jumps to a 0.08&nbsp;mm sliver face at the fin-to-base junction. The mesher cannot
+            create an element that spans this face &mdash; the face is below the minimum internal
+            element size. Return to SpaceClaim: the sliver was created by a chamfer operation
+            that did not reach the base plate correctly. Extending the chamfer to reach the base
+            plate eliminates the sliver. Re-mesh completes cleanly in 45 seconds.</p>
+          <p>The alternative &mdash; reducing global element size to 0.08&nbsp;mm to force elements
+            onto the sliver &mdash; produces a 6-million-element mesh with a 4-hour solve time
+            and no improvement in accuracy at the locations of interest. Return to SpaceClaim
+            first, always.</p>
         </aside>
       </section>
 
@@ -390,6 +460,20 @@
                 Identify the load path first, then prioritize quality improvements accordingly.</li>
           </ul>
         </aside>
+
+        <details class="example-block">
+          <summary>Example &mdash; connector-to-PCB interface: locating and fixing poor elements</summary>
+          <div class="example-content">
+            <p>A board-mounted power connector on a 2&nbsp;mm PCB. The connector footprint is an irregular polygon with short edges (0.3&nbsp;mm) at one corner. The mesh generates successfully but the skewness histogram shows 340 elements above 0.85.</p>
+            <ol>
+              <li><strong>Locate:</strong> in Mesh Metrics, drag to select the >0.85 skewness bin. The viewport highlights a cluster at one corner of the connector footprint &mdash; not distributed across the board.</li>
+              <li><strong>Diagnose:</strong> zoom to the highlighted region. A 0.28&nbsp;mm edge at the connector footprint corner is forcing transition elements smaller than the 1&nbsp;mm body sizing on the connector.</li>
+              <li><strong>Fix option A &mdash; SpaceClaim:</strong> merge the 0.28&nbsp;mm edge with the adjacent 2.1&nbsp;mm edge (Design &rarr; Pull &rarr; Merge Edges). This replaces both with a single 2.38&nbsp;mm edge. Re-mesh: maximum skewness drops from 0.89 to 0.42.</li>
+              <li><strong>Fix option B &mdash; Virtual Topology:</strong> if the edge must remain (load-bearing, or referenced by a boundary condition), apply Virtual Topology (Mesh &rarr; Insert &rarr; Virtual Topology) and merge the two adjacent small faces around the bad corner. The mesher treats the merged region as a single face. Maximum skewness drops from 0.89 to 0.51 without modifying SpaceClaim geometry.</li>
+            </ol>
+            <p>This connector footprint is at the PCB edge, remote from the clamping bolts. The remaining skewness of 0.42&ndash;0.51 is acceptable for the transportation analysis. If the connector were at a bolt location carrying primary load, SpaceClaim repair would be required.</p>
+          </div>
+        </details>
       </section>
 
       <section class="references" aria-label="References">

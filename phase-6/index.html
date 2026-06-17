@@ -109,6 +109,12 @@
                 own application. The <code>.aedt</code> file is the Maxwell project file.</li>
           </ul>
         </aside>
+
+        <aside class="example-note" aria-label="Example: meter housing and DC-DC transformer">
+          <span class="example-note-label">Practical example &mdash; meter housing and DC-DC transformer</span>
+          <p>Two components in the same product, each requiring a different solver. The utility meter housing has busbars carrying 200&nbsp;A&nbsp;DC: the outputs needed are current distribution and joule heat density for thermal analysis. Use Magnetostatic (or DC Conduction &mdash; the near-zero-frequency limit of Eddy Current). Excitation is DC; there are no skin-effect losses. Solve time: 8 minutes.</p>
+          <p>The DC-DC converter transformer switches at 20&nbsp;kHz with a trapezoidal primary current waveform. The question is winding AC loss and core loss. Use Eddy Current at 20&nbsp;kHz: this captures skin effect and proximity effect and returns winding loss broken down by conductor layer. The Transient solver is not needed unless saturation during a startup transient is the specific design concern. Eddy Current solve time: 14 minutes vs 6 hours for a full transient solve over enough switching cycles to reach steady state.</p>
+        </aside>
       </section>
 
       <section class="topic" id="geometry-setup">
@@ -158,6 +164,12 @@
             <li>Verify the air region size. This step is commonly skipped with the assumption
                 that 3&times; is always adequate — it is not for all geometries.</li>
           </ul>
+        </aside>
+
+        <aside class="example-note" aria-label="Example: meter housing conductor geometry">
+          <span class="example-note-label">Practical example &mdash; meter housing conductor geometry</span>
+          <p>Air region sensitivity check on two current-carrying conductors (12&nbsp;mm diameter, 180&nbsp;mm long): box at 3&times; clearance gives total computed loss = 1.04&nbsp;W. Box at 5&times; clearance: 1.04&nbsp;W (0.0% change). Box at 1.5&times; clearance: 1.08&nbsp;W (3.8% change &mdash; boundary condition compresses field lines near the conductor ends). For this geometry, 3&times; is adequate. Symmetry: both conductors are symmetric about the housing midplane. One symmetry cut halves the model &mdash; Maxwell solve time drops from 14 to 8 minutes. Excitation verified as mirror-symmetric (current magnitudes equal, directions opposite) before applying the cut.</p>
+          <p>Conductor simplification: round cross-sections replaced with equivalent-area rectangles. Computed resistance: round 25.5&nbsp;&mu;&Omega;, rectangular 25.8&nbsp;&mu;&Omega; (1.2% difference). Integrated total loss difference: 2.3%. Simplification accepted for loss estimation purposes.</p>
         </aside>
       </section>
 
@@ -212,6 +224,12 @@
                 applications. It balances accuracy against solve time.</li>
           </ul>
         </aside>
+
+        <aside class="example-note" aria-label="Example: meter housing conductor convergence">
+          <span class="example-note-label">Practical example &mdash; meter housing conductor convergence</span>
+          <p>Maxwell adaptive solve with 1% energy error target. Convergence history: Pass 1 (18,420 elements): error 24.8%. Pass 3: 12.1%. Pass 5: 4.2%. Pass 7: 1.8%. Pass 8: 0.9% &mdash; target reached. The quantity of engineering interest (computed DC resistance) converges to its final value (25.5&nbsp;&mu;&Omega;) by pass 5, before the energy error target is reached. At pass 5 the energy error is 4.2%, but the resistance differs from the pass-8 value by only 0.4%. Stopping at pass 5 would give the same engineering result.</p>
+          <p>The 1% energy error criterion is conservative for this application. A 2&ndash;3% target would produce the same engineering accuracy in fewer passes. Use the default 1% target for first runs; if solve time is a constraint, check whether the quantity of interest has converged earlier than the energy error metric, and adjust the target for subsequent runs.</p>
+        </aside>
       </section>
 
       <section class="topic" id="dc-conduction">
@@ -263,6 +281,20 @@
                 accurate distributed heat source rather than assuming uniform heating.</li>
           </ul>
         </aside>
+
+        <details class="example-block">
+          <summary>Example &mdash; meter housing conductors: current distribution and heat loss path</summary>
+          <div class="example-content">
+            <p>Two copper conductors (25&nbsp;mm &times; 6&nbsp;mm cross-section, 180&nbsp;mm long) carrying 200&nbsp;A&nbsp;DC. Question: where does the joule heat go &mdash; through the polycarbonate housing wall, or out through the aluminium dome connector at the terminal end?</p>
+            <ol>
+              <li><strong>Excitation:</strong> voltage boundary conditions &mdash; 0&nbsp;V at one terminal, V applied at the other, calculated to drive 200&nbsp;A. Copper conductivity at 75&deg;C operating temperature: 47&nbsp;MS/m (derated from 58&nbsp;MS/m at 20&deg;C).</li>
+              <li><strong>Sanity check before post-processing:</strong> expected resistance = L/(σ &times; A) = 0.18/(47&times;10<sup>6</sup> &times; 25&times;10<sup>&minus;6</sup> &times; 6&times;10<sup>&minus;3</sup>) = 25.5&nbsp;&mu;&Omega; per conductor. Expected loss = I&sup2;R = (200)&sup2; &times; 25.5&times;10<sup>&minus;6</sup> = 1.02&nbsp;W per conductor. Maxwell-computed loss: 1.04&nbsp;W. 2% agreement &mdash; proceed.</li>
+              <li><strong>Current density result:</strong> J is highest at the conductor corners and at the terminal connection necks &mdash; up to 1.8&times; the average. The peak heat generation is at the corners, not at the centre of the cross-section. Uniform power assumption would mislocate the hot spot.</li>
+              <li><strong>Thermal export &rarr; Mechanical Thermal:</strong> the joule loss density map shows 65% of total heat exits through the aluminium dome connector (low thermal resistance) and 35% exits through the polycarbonate housing wall (10&times; higher thermal resistance). The dome connector is the primary heat extraction path.</li>
+            </ol>
+            <p>Design implication: the dome connector material and its contact conductance to the external bus are the dominant thermal management variables for this component. Changing the housing material from polycarbonate to a higher-conductivity polymer saves at most 35% of the heat path &mdash; the dome connector dominates.</p>
+          </div>
+        </details>
       </section>
 
       <section class="topic" id="transformer-losses">
@@ -314,6 +346,27 @@
                 — a single fundamental-frequency run misses harmonic contributions.</li>
           </ul>
         </aside>
+
+        <details class="example-block">
+          <summary>Example &mdash; DC-DC transformer: winding AC losses and proximity effect at 20&nbsp;kHz</summary>
+          <div class="example-content">
+            <p>A flyback transformer: E25 ferrite core, 12-turn primary (0.3&nbsp;mm diameter copper wire, 3 layers), 3-turn secondary (flat foil, 0.5&nbsp;mm thick). Switching frequency: 20&nbsp;kHz. Primary current: 5&nbsp;A peak.</p>
+            <p>Setup:</p>
+            <ol>
+              <li><strong>Geometry:</strong> primary winding cross-section simplified to equivalent rectangular conductors (same cross-sectional area as round wire). Foil secondary modeled exactly. Air gap defined in core geometry.</li>
+              <li><strong>Material assignments:</strong> copper conductors at &sigma; = 52&nbsp;MS/m (75&deg;C operating temperature); core material N87 ferrite with Steinmetz parameters from TDK datasheet at 20&nbsp;kHz and B<sub>max</sub> = 200&nbsp;mT: k = 16.9, &alpha; = 1.25, &beta; = 2.35.</li>
+              <li><strong>Solver:</strong> Eddy Current at 20&nbsp;kHz. Excitation: 5&nbsp;A RMS through the primary winding.</li>
+            </ol>
+            <p>Results:</p>
+            <ul>
+              <li><strong>Primary DC resistance (hand calc):</strong> 0.18&nbsp;&Omega;. <strong>Primary AC resistance from Maxwell:</strong> 0.31&nbsp;&Omega;. AC/DC ratio = 1.72. The extra 0.13&nbsp;&Omega; is entirely proximity effect &mdash; eddy currents induced in each conductor by the magnetic field of adjacent winding layers.</li>
+              <li><strong>Current density plot:</strong> J is 3.4&times; higher at the primary conductor face closest to the secondary than at the back face. This is the proximity effect signature. The back face carries almost no current at 20&nbsp;kHz. A simple resistance calculation would not show this at all.</li>
+              <li><strong>Core loss distribution:</strong> concentrated at the centre leg and at the core window corners &mdash; 2.1&times; higher loss density at the corners than at the centre leg. Not uniform throughout the core.</li>
+              <li><strong>Total losses:</strong> winding 0.78&nbsp;W, core 0.54&nbsp;W, total 1.32&nbsp;W.</li>
+            </ul>
+            <p>Design action: reducing the primary to 2 layers (6 turns per layer) reduces the AC/DC ratio from 1.72 to 1.31 (fewer layer interfaces = less proximity-effect eddy current coupling). Winding loss drops by 0.18&nbsp;W &mdash; a 23% improvement at the cost of slightly larger core size to maintain inductance.</p>
+          </div>
+        </details>
       </section>
 
       <section class="topic" id="loss-export">
@@ -346,7 +399,10 @@
           200&nbsp;kHz, the current and loss are concentrated in a skin depth of approximately
           0.15&nbsp;mm from the conductor surface — a significant fraction of the total
           conductor volume generates almost no heat, while the surface layer generates nearly
-          all of it.
+          all of it. For the 20&nbsp;kHz transformer in the worked example (section 6.5), the
+          exported loss map passed directly to Icepak, where the heatsink solve then used
+          this spatially distributed transformer loss rather than a uniform 1.32&nbsp;W smeared
+          across the entire transformer body.
         </p>
 
         <aside class="key-points" aria-label="Key points for 6.6">

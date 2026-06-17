@@ -101,6 +101,12 @@
                 Icepak is the appropriate tool. Mechanical thermal cannot model these.</li>
           </ul>
         </aside>
+
+        <aside class="example-note" aria-label="Example: battery backup enclosure">
+          <span class="example-note-label">Practical example &mdash; battery backup enclosure</span>
+          <p>Two questions about the same enclosure, requiring different tools. Question&nbsp;1: &ldquo;What is FET junction temperature given a known heatsink surface temperature?&rdquo; The heatsink temperature is measured from hardware. The heat path is FET die &rarr; die attach &rarr; copper baseplate &rarr; TIM &rarr; heatsink &mdash; a conduction problem with a known boundary condition. Mechanical Steady-State Thermal is correct: apply the measured heatsink temperature, assign conductivities, compute T<sub>junction</sub>. Solve time: 4 minutes.</p>
+          <p>Question&nbsp;2: &ldquo;Will the fans provide adequate cooling with the enclosure fully assembled at 40&deg;C ambient?&rdquo; The answer depends on how air actually flows inside the enclosure &mdash; whether the heatsink, PCBs, and battery modules create blockages that reduce airflow at the FETs. Mechanical cannot answer this. Icepak is required: model the fans, vents, and internal obstacles, and compute local air velocity at the heatsink inlet. Solve time: 45 minutes.</p>
+        </aside>
       </section>
 
       <section class="topic" id="model-construction">
@@ -146,6 +152,14 @@
                 and solves faster than imported CAD for rectangular component bodies.</li>
           </ul>
         </aside>
+
+        <p>
+          An inverter with six power FETs and one transformer, for example, uses block objects
+          for all six FETs (standard packages with datasheet &Theta;<sub>JC</sub> values), a
+          parametric heatsink object, and fan objects with the corrected operating-temperature
+          curve &mdash; the entire model constructed in under an hour without any imported
+          CAD geometry.
+        </p>
       </section>
 
       <section class="topic" id="compact-models">
@@ -185,6 +199,27 @@
                 compact models are circular. Use detailed geometry for those components.</li>
           </ul>
         </aside>
+
+        <details class="example-block">
+          <summary>Example &mdash; inverter FET array: JEDEC compact model vs. detailed CFD geometry</summary>
+          <div class="example-content">
+            <p>Six TO-247 power FETs on a heatsink. Analysis goal: verify FET junction temperatures below 125&deg;C at rated power (50&nbsp;W per FET, 300&nbsp;W total).</p>
+            <p><strong>Compact model (JEDEC two-resistor):</strong></p>
+            <ul>
+              <li>Each FET: &Theta;<sub>JC</sub> = 0.4&nbsp;K/W, &Theta;<sub>JB</sub> = 5&nbsp;K/W from datasheet</li>
+              <li>In Icepak: each FET is a block object at its footprint location; power = 50&nbsp;W; thermal resistances from datasheet</li>
+              <li>Solve time: 8 minutes</li>
+              <li>T<sub>junction,max</sub> = 101&deg;C (at the two FETs nearest the transformer, where air temperature is highest after passing over upstream heat sources)</li>
+            </ul>
+            <p><strong>Detailed geometry CFD (imported package body):</strong></p>
+            <ul>
+              <li>FET body: die (5&nbsp;mm &times; 5&nbsp;mm), die attach, copper clip, mold compound modeled explicitly from component cross-section</li>
+              <li>Solve time: 47 minutes</li>
+              <li>T<sub>junction,max</sub> = 104&deg;C at the same location (3&deg;C higher than compact model)</li>
+            </ul>
+            <p>Conclusion: 3&deg;C difference (3%) between approaches. For a margin check against a 125&deg;C limit with 24&deg;C of margin, compact models are adequate &mdash; the model error is far smaller than the design margin. The 47-minute detailed solve is not justified when the question is &ldquo;are we below the limit?&rdquo; Detailed geometry would be warranted if the question were &ldquo;what is the minimum TIM conductivity before the limit is exceeded?&rdquo; &mdash; where the 3&deg;C uncertainty is material to the decision.</p>
+          </div>
+        </details>
       </section>
 
       <section class="topic" id="forced-convection">
@@ -226,6 +261,20 @@
                 zones before drawing conclusions from temperature results.</li>
           </ul>
         </aside>
+
+        <details class="example-block">
+          <summary>Example &mdash; cast-Al heatsink: fan curve correction and recirculation identification</summary>
+          <div class="example-content">
+            <p>A forced-air heatsink: 120&nbsp;mm &times; 80&nbsp;mm base, 35&nbsp;mm fins, 5&nbsp;mm pitch. Two 60&nbsp;mm fans. Operating inlet air: 60&deg;C. Total dissipation: 150&nbsp;W.</p>
+            <ol>
+              <li><strong>Fan curve correction:</strong> datasheet curve is at 25&deg;C. At 60&deg;C, air density is 10% lower &mdash; the fans deliver less mass flow at the same pressure. Correction factor: (273 + 60)/(273 + 25) = 1.117 for temperature, reducing mass flow by approximately 10%. Enter the corrected curve in Icepak. If the uncorrected 25&deg;C curve is used, Icepak overestimates airflow and underpredicts temperatures by 5&ndash;8&deg;C.</li>
+              <li><strong>Vent free-area fraction:</strong> outlet grille is 40% open (louvered). Enter 0.40 in the Vent object. Setting this to 1.0 predicts 2.5&times; the actual exit velocity and dramatically underestimates the pressure drop at the outlet &mdash; the fan operates at a much lower pressure point on the curve and delivers much more flow than is physically present.</li>
+              <li><strong>Velocity vector check after first solve:</strong> plot velocity vectors in the fin channel plane (cut plane parallel to airflow, at mid-height of the fins). Uniform flow entering all fin channels is expected. In this case: a recirculation zone is visible behind the transformer body mounted downstream of the heatsink. Hot exhaust air folds back and re-enters the first two fin channels, raising their inlet air temperature by 8&deg;C.</li>
+              <li><strong>Fix:</strong> add a 15&nbsp;mm deflector plate between the transformer and the heatsink inlet. Re-solve: the inlet temperature elevation at the first two fin channels drops from 8&deg;C to 2&deg;C. FET case temperature drops by 6&deg;C.</li>
+            </ol>
+            <p>The recirculation zone was not visible from the temperature contour plot alone &mdash; it appeared only as a localised hotspot on two fins. The velocity vector plot identified the mechanism directly.</p>
+          </div>
+        </details>
       </section>
 
       <section class="topic" id="parametric-study">
@@ -267,6 +316,12 @@
                 too narrow increases pressure drop and reduces airflow. The parametric
                 sweep reveals this optimum directly.</li>
           </ul>
+        </aside>
+
+        <aside class="example-note" aria-label="Example: cast-Al heatsink parametric study">
+          <span class="example-note-label">Practical example &mdash; cast-Al heatsink parametric study</span>
+          <p>Parameter sweep: fin height (30, 40, 50, 60&nbsp;mm) &times; fin spacing (3, 5, 7, 10&nbsp;mm) = 16 design points. Coarse mesh, 2&nbsp;mm global size: 8 minutes per point, 2 hours 8 minutes total. Key result: minimum T<sub>junction</sub> is not at the tallest fins with the narrowest spacing. Narrowing from 5&nbsp;mm to 3&nbsp;mm increases pressure drop to the point where the fans deliver 30% less flow, and T<sub>junction</sub> rises despite the larger surface area. The optimum is at 40&nbsp;mm height / 5&nbsp;mm spacing.</p>
+          <p>Fine-mesh verification at the optimum: T<sub>junction</sub> = 98&deg;C vs 103&deg;C from the coarse sweep. The 5&deg;C coarse-mesh error is acceptable for locating the optimum but not for reporting the final result. Run the fine-mesh solve only at the confirmed optimum &mdash; not at all 16 design points.</p>
         </aside>
       </section>
 
@@ -313,6 +368,27 @@
                 it may reflect coincidental error cancellation rather than true accuracy.</li>
           </ul>
         </aside>
+
+        <details class="example-block">
+          <summary>Example &mdash; inverter assembly: planning measurement locations and resolving a correlation failure</summary>
+          <div class="example-content">
+            <p>Pre-test plan for a 300&nbsp;W inverter PCB assembly. Thermocouple placement decided before hardware build (simulation identifies the likely hotspot locations):</p>
+            <ul>
+              <li>TC1: FET case surface, hottest FET from Icepak result at rated power</li>
+              <li>TC2: transformer outer surface, top winding</li>
+              <li>TC3: heatsink base plate, near FET mounting footprint</li>
+              <li>TC4: inlet air temperature (reference)</li>
+            </ul>
+            <p><strong>Post-test correlation (all values at rated power, 40&deg;C ambient):</strong></p>
+            <ul>
+              <li>TC3 (heatsink): Sim 52&deg;C, Measured 54&deg;C, &Delta; = +2&deg;C &mdash; well-correlated</li>
+              <li>TC1 (FET case): Sim 74&deg;C, Measured 81&deg;C, &Delta; = +7&deg;C &mdash; within acceptable range</li>
+              <li>TC2 (transformer): Sim 68&deg;C, Measured 88&deg;C, &Delta; = +20&deg;C &mdash; significant underprediction</li>
+            </ul>
+            <p><strong>Diagnosis of TC2 error (20&deg;C):</strong> the simulation used the published transformer core loss from the datasheet (3.2&nbsp;W at nominal flux density). The actual transformer dissipation at full load, measured by inlet-outlet calorimetry, is 7.1&nbsp;W. The core loss input was based on a flux density that differed from the operating point &mdash; the transformer is running at higher flux than the datasheet characterisation condition. Correcting the power assignment to 7.1&nbsp;W brings the transformer prediction to 89&deg;C (1&deg;C from measured).</p>
+            <p>This is the most common root cause of large correlation errors: incorrect power input, not a mesh or geometry problem. Verify component power before investigating any other source of error.</p>
+          </div>
+        </details>
       </section>
 
       <section class="topic" id="superposition">
@@ -352,6 +428,33 @@
                 is acceptable for design trade studies.</li>
           </ul>
         </aside>
+
+        <details class="example-block">
+          <summary>Example &mdash; FET array and transformer sub-models: computing T-rise by superposition</summary>
+          <div class="example-content">
+            <p>A power supply: 200&nbsp;W heatsink-mounted FET array (six FETs, 33&nbsp;W each) and a 12&nbsp;W transformer. Full assembly Icepak solve: 90 minutes. Goal: estimate T<sub>junction</sub> for design trade studies in 22 minutes using superposition.</p>
+            <p>All sub-models use 0&deg;C ambient boundary (T-rise model): this lets T-rise results be added directly to any ambient temperature, without re-running the simulation when ambient changes.</p>
+            <p><strong>Sub-model 1 &mdash; FET array only (transformer removed):</strong></p>
+            <ul>
+              <li>FETs at 33&nbsp;W each, fans modeled, 0&deg;C ambient</li>
+              <li>&Delta;T at FET case above ambient: 31&nbsp;K (per FET, at rated power)</li>
+              <li>Solve time: 12 minutes</li>
+            </ul>
+            <p><strong>Sub-model 2 &mdash; transformer only (FETs removed):</strong></p>
+            <ul>
+              <li>Transformer at 12&nbsp;W, fans modeled identically, 0&deg;C ambient</li>
+              <li>&Delta;T at transformer surface: 38&nbsp;K above ambient</li>
+              <li>Cross-coupling: transformer heat raises FET inlet air by +3&deg;C (computed by adding a 12&nbsp;W dummy source at the transformer location in sub-model 1)</li>
+              <li>Solve time: 10 minutes</li>
+            </ul>
+            <p><strong>Superposition result at T<sub>amb</sub> = 40&deg;C:</strong></p>
+            <ul>
+              <li>T<sub>FET case</sub> = 40 + 31 + 3 = 74&deg;C</li>
+              <li>T<sub>junction</sub> = T<sub>case</sub> + P &times; &Theta;<sub>JC</sub> = 74 + 33 &times; 0.4 = 87&deg;C</li>
+            </ul>
+            <p>Full assembly verification: T<sub>junction</sub> = 89&deg;C (2&deg;C from superposition). Acceptable for a design trade study. Superposition is valid here because the transformer (20% of the heatsink cross-section) does not significantly redirect airflow to the heatsink. If the transformer were larger, the airflow redistribution assumption would need verification.</p>
+          </div>
+        </details>
       </section>
 
 
@@ -468,6 +571,12 @@
                 post-processing. Use R<sub>&theta;</sub> = L/(k&times;A) as a sanity check
                 on the simulation output.</li>
           </ul>
+        </aside>
+
+        <aside class="example-note" aria-label="Example: heatsink assembly pre-check">
+          <span class="example-note-label">Practical example &mdash; heatsink assembly pre-check</span>
+          <p>Before opening Icepak for a 300&nbsp;W forced-air enclosure: fan rated 45&nbsp;CFM at 0&nbsp;Pa, 0&nbsp;CFM at 50&nbsp;Pa. Estimated system pressure drop: 2&nbsp;Pa. Fan operating point: ~42&nbsp;CFM (19.8&nbsp;L/s). At 60&deg;C inlet: &dot;m &asymp; 1.0&nbsp;kg/m&sup3; &times; 19.8&times;10<sup>&minus;3</sup>&nbsp;m&sup3;/s = 19.8&nbsp;g/s. Vent area 80&nbsp;cm&sup2;, free-area fraction 0.45: effective area 36&nbsp;cm&sup2;. Vent velocity: 19.8&times;10<sup>&minus;3</sup>/0.0036 = 5.5&nbsp;m/s &mdash; below the 7&nbsp;m/s threshold. Vent sizing is acceptable.</p>
+          <p>Convection vs radiation at the heatsink base (80&deg;C, bare aluminium &epsilon;&nbsp;&asymp;&nbsp;0.1, forced h&nbsp;=&nbsp;40&nbsp;W/m&sup2;K): q<sub>conv</sub> = 40&times;55 = 2200&nbsp;W/m&sup2;; q<sub>rad</sub> = 0.1&times;5.67&times;10<sup>&minus;8</sup>&times;(353<sup>4</sup>&minus;298<sup>4</sup>) &asymp; 43&nbsp;W/m&sup2;. Radiation is 2% of convection &mdash; safely neglected. TIM layer pre-check: k&nbsp;=&nbsp;3&nbsp;W/mK, t&nbsp;=&nbsp;0.5&nbsp;mm, A&nbsp;=&nbsp;50&nbsp;cm&sup2;. R<sub>&theta;,TIM</sub> = 0.0005/(3&times;0.005) = 0.033&nbsp;K/W. At 300&nbsp;W: &Delta;T<sub>TIM</sub> = 9.9&deg;C. Non-negligible &mdash; the TIM layer must be included in the Icepak model explicitly.</p>
         </aside>
       </section>
 
