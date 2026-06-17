@@ -57,10 +57,18 @@
         <span class="phase-label">Phase 5</span>
         <h1>Icepak</h1>
         <p class="phase-intro">
-          Icepak solves heat transfer and fluid flow simultaneously — conjugate heat transfer.
-          It is the appropriate tool when airflow distribution affects the thermal result.
+          Icepak solves heat transfer and fluid flow simultaneously (conjugate heat transfer —
+          the coupled solution of conduction and fluid convection). It is the appropriate tool
+          when airflow distribution affects the thermal result.
           This phase covers the decision of when to use Icepak versus Mechanical thermal,
           the model construction workflow, and the interpretation and validation of results.
+        </p>
+        <p class="phase-intro">
+          Note on scope: Phase 4 uses Mechanical Steady-State Thermal to couple temperature
+          loads into structural stress calculations. That use case and this one are distinct.
+          Phase 5 addresses the separate problem of electronics cooling &mdash; determining
+          whether components are adequately cooled when airflow distribution is the critical
+          variable.
         </p>
       </header>
 
@@ -136,7 +144,9 @@
         <p>
           The power budget is the most important input. Verify power values against the system
           power budget before running. A 50% error in component power produces approximately
-          a 50% error in junction temperature. Use the object library for standard components
+          a 50% error in junction temperature in a conduction-dominated thermal path &mdash;
+          treat this as an order-of-magnitude estimate for convection-dominated enclosures.
+          Use the object library for standard components
           and import simplified SpaceClaim geometry only for custom or critical components.
         </p>
 
@@ -364,8 +374,10 @@
                 temperature plus &Theta;<sub>JC</sub> &times; power. Report the basis for the
                 junction temperature estimate alongside the measurement.</li>
             <li>A model within 10&deg;C of hardware is well-correlated for an electronics
-                thermal model. Agreement better than 5&deg;C should be validated carefully —
-                it may reflect coincidental error cancellation rather than true accuracy.</li>
+                thermal model. Agreement better than 5&deg;C does not guarantee model fidelity &mdash;
+                verify that each major input uncertainty is small. Compensating errors (overestimated
+                component power offset by underestimated thermal resistance) can produce artificially
+                close results.</li>
           </ul>
         </aside>
 

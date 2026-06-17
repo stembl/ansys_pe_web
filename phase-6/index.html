@@ -60,6 +60,12 @@
           distribution, AC winding losses in magnetics, and transformer loss characterization.
           This phase covers the Maxwell workflow from geometry setup through loss export.
         </p>
+        <p class="phase-intro">
+          Connection to Phase 5: Maxwell produces volumetric electromagnetic loss maps (W/m&sup3;)
+          for conductors and cores. These loss maps are exported as distributed heat sources
+          into Icepak, completing the EM&rarr;thermal chain described in Phase 7.
+          Run Maxwell first to establish the loss input; then run Icepak with those losses applied.
+        </p>
       </header>
 
       <section class="topic" id="maxwell-orientation">
@@ -133,8 +139,8 @@
         <h3>Material assignment</h3>
         <p>
           <strong>Conductors</strong>: assign bulk conductivity (&sigma;, S/m) at the
-          operating temperature. Copper conductivity varies significantly with temperature
-          (58 MS/m at 20&deg;C, 45 MS/m at 75&deg;C) — enter the value at operating temperature
+          operating temperature.           Copper conductivity varies significantly with temperature
+          (58 MS/m at 20&deg;C, 48 MS/m at 75&deg;C) — enter the value at operating temperature
           for accurate loss calculations.
         </p>
         <p>
