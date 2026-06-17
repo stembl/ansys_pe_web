@@ -1,12 +1,12 @@
-Ôªø<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Mesh quality metrics, sizing strategy, mesh methods, inflation layers, and troubleshooting in ANSYS Mechanical.">
-  <link rel="canonical" href="https://stembl.github.io/ansys_pe_web/phase-3/">
-  <title>Phase 3: Meshing ‚Äî FEA for Power Electronics</title>
+  <link rel="canonical" href="https://simulation.thehardwareos.com/phase-3/">
+  <title>Phase 3: Meshing ù FEA for Power Electronics</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,6 +16,7 @@
   <header class="site-header" role="banner">
     <div class="container">
       <a href="../" class="site-logo">FEA for Power Electronics</a>
+      <a href="https://thehardwareos.com" class="site-parent-link" rel="noopener">The Hardware OS</a>
       <span class="version-pill">2025 R2</span>
     </div>
   </header>
@@ -85,7 +86,7 @@
           <dt>Aspect ratio</dt>
           <dd>Ratio of the longest to shortest dimension of an element. Target: below 10
               for most elements. Thin-feature elements (solder joints, TIM layers, adhesive)
-              may reach 20‚Äì30 without causing problems if the long axis is aligned with the
+              may reach 20ù30 without causing problems if the long axis is aligned with the
               thermal or stress gradient direction.</dd>
         </dl>
 
@@ -100,7 +101,7 @@
         <aside class="key-points" aria-label="Key points for 3.1">
           <span class="key-points-label">Key points</span>
           <ul>
-            <li>Skewness above 0.9 produces unreliable results at those elements ‚Äî find
+            <li>Skewness above 0.9 produces unreliable results at those elements ù find
                 the source feature in SpaceClaim and fix it.</li>
             <li>Check the histogram, not just the worst value. A shifted distribution
                 indicates a systemic geometry problem, not a single bad face.</li>
@@ -131,14 +132,14 @@
         <p>
           Set the global element size coarse, then refine only where the gradient is
           highest. A coarse global size with targeted local refinements almost always
-          outperforms a uniformly fine mesh ‚Äî it preserves element count where accuracy
+          outperforms a uniformly fine mesh ù it preserves element count where accuracy
           is not needed while concentrating resolution where it is.
         </p>
 
         <p>
           The cost of over-refinement: element count scales as (refinement factor)&sup3; in 3D.
           A 2&times; refinement produces 8&times; more elements. A 3&times; refinement produces
-          27&times;. Set the global size to 2‚Äì5&times; the smallest important feature, then
+          27&times;. Set the global size to 2ù5&times; the smallest important feature, then
           refine selectively.
         </p>
 
@@ -153,7 +154,7 @@
               inside its boundary regardless of what geometry is inside. Use for regions that
               need refinement but have no convenient face to size on.</li>
           <li><strong>Mesh refinement</strong>: applies additional refinement passes after the
-              initial mesh. Use as a post-solve check ‚Äî refine in the high-gradient region and
+              initial mesh. Use as a post-solve check ù refine in the high-gradient region and
               compare results to verify convergence.</li>
         </ul>
 
@@ -204,7 +205,7 @@
 
           <dt>Multizone<sup class="cite"><a href="#ref-4">[4]</a></sup></dt>
           <dd>Produces hex elements in sweepable regions and tet elsewhere. Better accuracy
-              per element for prismatic geometries ‚Äî heatsink fins, connector bodies, fastener
+              per element for prismatic geometries ù heatsink fins, connector bodies, fastener
               standoffs. Requires the geometry to be decomposable into sweepable regions.
               Worth the additional SpaceClaim preparation time when these components are
               critical to the result.</dd>
@@ -213,7 +214,7 @@
           <dd>Structured hex through a single sweep direction. The most accurate element type
               for thin-feature bodies: solder joints, adhesive layers, TIM, laminates. Requires
               a simple, prismatic body (source face, target face, clean sweep path). Apply
-              selectively to the critical thin-feature bodies ‚Äî not to the whole model.</dd>
+              selectively to the critical thin-feature bodies ù not to the whole model.</dd>
         </dl>
 
         <p>
@@ -229,11 +230,11 @@
           <ul>
             <li>Tetrahedral meshing is the practical choice for complex assemblies. Spend
                 time on defeaturing, not on hex meshing the entire model.</li>
-            <li>Sweep meshing on solder joints and TIM layers ensures at least 3‚Äì5 elements
+            <li>Sweep meshing on solder joints and TIM layers ensures at least 3ù5 elements
                 through the thickness, which is the minimum for accurate through-thickness
                 gradient resolution.</li>
             <li>Multizone requires sweepable geometry. If SpaceClaim did not produce a clean
-                prismatic body, multizone will fail with an error ‚Äî fall back to tet.</li>
+                prismatic body, multizone will fail with an error ù fall back to tet.</li>
           </ul>
         </aside>
 
@@ -268,14 +269,14 @@
         </p>
         <p>
           Inflation settings: first layer height calculated from the expected boundary layer
-          thickness at the relevant Reynolds number; growth rate 1.2; target 5‚Äì10 layers
+          thickness at the relevant Reynolds number; growth rate 1.2; target 5ù10 layers
           through the boundary layer region.
         </p>
 
         <h3>In structural analyses</h3>
         <p>
-          Inflation through thin structural features ‚Äî solder joints, adhesive layers,
-          laminates ‚Äî ensures adequate element count through the thickness. The minimum
+          Inflation through thin structural features ù solder joints, adhesive layers,
+          laminates ù ensures adequate element count through the thickness. The minimum
           for reliable through-thickness stress is three elements. Apply inflation with a
           "total thickness" specification to fill the feature depth regardless of its
           actual dimension.
@@ -284,14 +285,14 @@
         <aside class="key-points" aria-label="Key points for 3.4">
           <span class="key-points-label">Key points</span>
           <ul>
-            <li>In Icepak, inflation at solid-fluid interfaces is not optional ‚Äî without it
+            <li>In Icepak, inflation at solid-fluid interfaces is not optional ù without it
                 the near-wall heat transfer is underresolved and junction temperature
                 predictions are unreliable.</li>
             <li>In structural analysis, inflation ensures at least 3 elements through thin
                 features. One element through a solder joint cannot resolve the bending
                 stress distribution.</li>
             <li>Use "total thickness" inflation specification rather than a fixed number of
-                layers ‚Äî it adapts to the actual feature thickness at each face.</li>
+                layers ù it adapts to the actual feature thickness at each face.</li>
           </ul>
         </aside>
 
@@ -379,7 +380,7 @@
 
         <p>
           Section 3.5 covers failure to generate. This section covers the other outcome:
-          the mesh generates, but quality metrics are unacceptable ‚Äî high skewness, low
+          the mesh generates, but quality metrics are unacceptable ù high skewness, low
           orthogonal quality, or both. The approach is different because there is a mesh
           to inspect.
         </p>
@@ -399,10 +400,10 @@
         </p>
         <ul>
           <li><strong>Bad elements clustered at one body</strong>: that body has a geometric
-              problem ‚Äî a sliver face, a near-tangent surface, or a gap at an interface.
+              problem ù a sliver face, a near-tangent surface, or a gap at an interface.
               Return to SpaceClaim.</li>
           <li><strong>Bad elements at body interfaces</strong>: the bodies are not sharing
-              topology ‚Äî contact patches are generating transition elements. Apply Share
+              topology ù contact patches are generating transition elements. Apply Share
               topology in SpaceClaim.</li>
           <li><strong>Bad elements spread uniformly across a body</strong>: the global element
               size is too coarse relative to the body's curvature or a curved face is
@@ -425,7 +426,7 @@
               very short edges below a threshold length before element generation.
               Eliminates the small-edge-driven poor elements without geometry surgery.</li>
           <li><strong>Mesh defeaturing</strong> (Mesh Details &rarr; Defeature Size): the
-              mesher ignores geometric features below this length. Use as a last resort ‚Äî
+              mesher ignores geometric features below this length. Use as a last resort ù
               it discards geometry information that may be relevant elsewhere.</li>
         </ol>
 
@@ -439,7 +440,7 @@
               Accept them.</li>
           <li>Poor elements at a mounting hole that carries load directly? Fix them.</li>
           <li>High aspect ratio at a solder joint where you are computing through-thickness
-              stress? Fix it ‚Äî apply Sweep meshing to that body.</li>
+              stress? Fix it ù apply Sweep meshing to that body.</li>
           <li>High aspect ratio at a structural brace far from the area of interest?
               Accept it if the long axis is aligned with the load direction.</li>
         </ul>
@@ -488,6 +489,17 @@
         </ol>
       </section>
 
+      <aside class="hub-ref" aria-label="Ansys Learning Hub references">
+        <span class="hub-ref__label">Ansys Learning Hub ó recommended courses</span>
+        <ul class="hub-ref__list">
+          <li>
+            <a href="https://learninghub.ansys.com/learn/external-ecommerce;view=none;redirectURL=?ctldoc-catalog-0=se-Mechanical%20Getting%20Started"
+               target="_blank" rel="noopener">Ansys Mechanical Getting Started: Basics</a>
+            <span class="hub-ref__meta">8&nbsp;hr &middot; E-learning &middot; ?5 &middot; search: "Mechanical Getting Started Basics" at learninghub.ansys.com</span>
+          </li>
+        </ul>
+      </aside>
+
       <nav class="phase-nav" aria-label="Phase navigation">
         <a href="../phase-2/" class="phase-nav-btn is-prev">
           <span class="nav-arrow" aria-hidden="true">&larr;</span>
@@ -514,5 +526,6 @@
   </footer>
 </body>
 </html>
+
 
 
