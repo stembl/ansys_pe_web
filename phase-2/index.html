@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+Ôªø<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -6,7 +6,7 @@
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="CAD import, defeaturing for structural, thermal, and EM analysis, and shared topology in ANSYS SpaceClaim.">
   <link rel="canonical" href="https://simulation.thehardwareos.com/phase-2/">
-  <title>Phase 2: Geometry Preparation ù FEA for Power Electronics</title>
+  <title>Phase 2: Geometry Preparation &mdash; FEA for Power Electronics</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -70,7 +70,7 @@
 
         <p>
           SpaceClaim accepts STEP, IGES, Parasolid, ACIS, and native formats from major
-          CAD systems through available translators. STEP is the preferred neutral format ù
+          CAD systems through available translators. STEP is the preferred neutral format &mdash;
           it preserves topology more reliably than IGES and handles assembly structure better.
           Export as STEP AP214, verify units before import, and check the result immediately.
         </p>
@@ -138,7 +138,7 @@
           Check Geometry reports geometric errors but does not find all mesh-hostile features.
           Small faces and short edges only appear as mesh warnings or failures, not as Check
           Geometry errors. Use mesh quality metrics as a feedback loop: after the first mesh,
-          go back to SpaceClaim for features that drove poor quality ù not just outright failures.
+          go back to SpaceClaim for features that drove poor quality &mdash; not just outright failures.
         </p>
 
         <aside class="key-points" aria-label="Key points for 2.2">
@@ -147,7 +147,7 @@
             <li>The mesh fails or degrades exactly where the geometry is bad. Identify problems
                 before meshing, not after.</li>
             <li>Thin slivers and near-zero-angle edges are the most common source of high skewness
-                elements. They rarely appear in Check Geometry ù look for them manually by
+                elements. They rarely appear in Check Geometry &mdash; look for them manually by
                 inspecting highly curved or thin regions.</li>
             <li>A feature smaller than the target mesh size will force the mesher to reduce
                 element size everywhere near it, not just at that feature.</li>
@@ -189,7 +189,7 @@
           The threshold question: if this feature is removed, does the stress result at the
           locations of interest change by more than the acceptable error? If the answer is
           no for a realistic load magnitude, remove it. The answer requires knowing the load
-          path ù you cannot make this judgment without it.
+          path &mdash; you cannot make this judgment without it.
         </p>
 
         <aside class="key-points" aria-label="Key points for 2.3">
@@ -227,8 +227,8 @@
           Identify the thermal model requirements before modifying geometry. Which components
           are heat sources? What is the fluid path? Which surfaces transfer heat by convection?
           Which interfaces transfer heat by conduction? Features outside the heat path can be
-          simplified aggressively. Thermal interface surfaces ù component footprints, TIM
-          layers, heatsink contact ù must be preserved exactly.
+          simplified aggressively. Thermal interface surfaces &mdash; component footprints, TIM
+          layers, heatsink contact &mdash; must be preserved exactly.
         </p>
 
         <p>
@@ -240,7 +240,7 @@
 
         <p>
           Thermal interface rules: component footprint faces must be coplanar with the board
-          surface ù any gap becomes a thermal air gap in the simulation. A 0.1&nbsp;mm air
+          surface &mdash; any gap becomes a thermal air gap in the simulation. A 0.1&nbsp;mm air
           gap between a component body and the PCB adds meaningful thermal resistance and
           will produce incorrect junction temperature predictions.
         </p>
@@ -280,13 +280,13 @@
           identify: which conductors carry current, which materials have significant
           permeability or conductivity, and whether the field distribution has any symmetry
           planes. Features outside the active field region can be removed. Features that
-          define current paths ù conductor cross-sections, insulation gaps ù must be exact.
+          define current paths &mdash; conductor cross-sections, insulation gaps &mdash; must be exact.
         </p>
 
         <p>
           <strong>Air region</strong>: the most important step. Create a box or sphere
           enclosing the device with 3&times; clearance in each direction as a starting point.
-          Verify by comparing results at 3&times; and 5&times; clearance ù if inductance or
+          Verify by comparing results at 3&times; and 5&times; clearance &mdash; if inductance or
           loss changes by more than 2%, use 5&times;.
         </p>
 
@@ -308,7 +308,7 @@
           <span class="key-points-label">Key points</span>
           <ul>
             <li>The air region size determines boundary condition accuracy. Verify by comparing
-                results at 3&times; and 5&times; ù do not assume 3&times; is always sufficient.</li>
+                results at 3&times; and 5&times; &mdash; do not assume 3&times; is always sufficient.</li>
             <li>Symmetry is the single most effective way to reduce Maxwell solve time.
                 Each valid symmetry plane halves the element count.</li>
             <li>Winding cross-section shape (round vs. rectangular) matters less than winding
@@ -361,7 +361,7 @@
           where structural load or heat must transfer between parts (Design &rarr; Share).<sup class="cite"><a href="#ref-3">[3]</a></sup>
           Share creates coincident node interfaces at part boundaries. Without shared topology,
           adjacent parts have independent meshes, and the solver uses contact elements to
-          transfer quantities ù which is slower and introduces numerical error.
+          transfer quantities &mdash; which is slower and introduces numerical error.
         </p>
 
         <h3>Icepak geometry preparation tool</h3>
@@ -372,7 +372,7 @@
           The result meshes very cleanly because it is a simple outer surface.
         </p>
         <p>
-          The tradeoff is irreversible: all internal geometry is discarded ù internal conductor
+          The tradeoff is irreversible: all internal geometry is discarded &mdash; internal conductor
           paths, component bodies, board layers, and internal structure are gone. Use this tool
           when: the assembly is too complex to repair manually and only exterior convection
           surfaces are needed, or when manual repair is exhausted and the mesh still fails.
@@ -389,7 +389,7 @@
                 parts. A missed interface shows as a physically impossible temperature or
                 stress discontinuity at that face.</li>
             <li>The Icepak preparation tool destroys interior geometry. Appropriate as a last
-                resort for exterior-only thermal analysis ù not as a default cleanup step.</li>
+                resort for exterior-only thermal analysis &mdash; not as a default cleanup step.</li>
           </ul>
         </aside>
 
@@ -412,7 +412,7 @@
       </section>
 
       <aside class="hub-ref" aria-label="Ansys Learning Hub references">
-        <span class="hub-ref__label">Ansys Learning Hub ó recommended courses</span>
+        <span class="hub-ref__label">Ansys Learning Hub &mdash; recommended courses</span>
         <ul class="hub-ref__list">
           <li>
             <a href="https://learninghub.ansys.com/learn/external-ecommerce;view=none;redirectURL=?ctldoc-catalog-0=category_id-797"
