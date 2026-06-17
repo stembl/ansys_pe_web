@@ -1,12 +1,12 @@
-Ôªø<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="Static stress, modal, random vibration, thermal-structural coupling, and solver convergence in ANSYS Mechanical.">
-  <link rel="canonical" href="https://stembl.github.io/ansys_pe_web/phase-4/">
-  <title>Phase 4: Structural and Thermal ‚Äî FEA for Power Electronics</title>
+  <link rel="canonical" href="https://simulation.thehardwareos.com/phase-4/">
+  <title>Phase 4: Structural and Thermal ù FEA for Power Electronics</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,6 +16,7 @@
   <header class="site-header" role="banner">
     <div class="container">
       <a href="../" class="site-logo">FEA for Power Electronics</a>
+      <a href="https://thehardwareos.com" class="site-parent-link" rel="noopener">The Hardware OS</a>
       <span class="version-pill">2025 R2</span>
     </div>
   </header>
@@ -59,7 +60,7 @@
           This phase covers the six analysis types most commonly needed for power electronics
           mechanical qualification: static stress, modal frequency extraction, random
           vibration, thermal-structural coupling, and plastic deformation. The analyses
-          are presented in the order they are typically run ‚Äî each builds on the previous.
+          are presented in the order they are typically run ù each builds on the previous.
         </p>
       </header>
 
@@ -68,7 +69,7 @@
 
         <p>
           Boundary conditions define the rigid-body constraint and load application. The
-          constraint must match the physical installation ‚Äî over-constraining gives
+          constraint must match the physical installation ù over-constraining gives
           artificially low deflection and stress; under-constraining causes rigid-body
           motion and solver failure.
         </p>
@@ -145,7 +146,7 @@
           <dt>Maximum principal stress</dt>
           <dd>The largest tensile stress at a point. Use for brittle materials (FR4 laminate,
               ceramic, glass) and for crack growth assessment. FR4 fails in tension on the
-              outer fiber ‚Äî maximum principal stress is the relevant criterion.</dd>
+              outer fiber ù maximum principal stress is the relevant criterion.</dd>
 
           <dt>Total deformation</dt>
           <dd>Displacement magnitude. Use to verify that deflections do not cause secondary
@@ -161,7 +162,7 @@
         </p>
         <ul>
           <li>At a fillet or radius: stress converges to a finite value as mesh refines.
-              This is physically real ‚Äî report it.</li>
+              This is physically real ù report it.</li>
           <li>At a perfectly sharp internal corner: stress increases without converging as
               mesh refines. Replace the corner with the minimum physical radius from
               manufacturing tolerance, then re-run.</li>
@@ -175,7 +176,7 @@
                 the result.</li>
             <li>Use Von Mises for ductile metals; maximum principal stress for brittle
                 materials and FR4 laminate.</li>
-            <li>Always check deformation ‚Äî structural adequacy includes both stress margin
+            <li>Always check deformation ù structural adequacy includes both stress margin
                 and displacement limits at connectors and mounting interfaces.</li>
           </ul>
         </aside>
@@ -192,13 +193,13 @@
 
         <p>
           Modal analysis computes the natural frequencies and mode shapes of the structure.
-          It is always run before random vibration analysis ‚Äî random vibration requires modal
+          It is always run before random vibration analysis ù random vibration requires modal
           results as its upstream input.
         </p>
 
         <p>
           Setup: apply the same structural supports as the static analysis. No loads are
-          required (modal is a free-vibration problem ‚Äî the solver finds frequencies at which
+          required (modal is a free-vibration problem ù the solver finds frequencies at which
           the structure vibrates naturally given its mass and stiffness distribution). Set the
           number of modes to extract to cover at least 1.5&times; the highest frequency of
           interest in the subsequent random vibration analysis.
@@ -206,7 +207,7 @@
 
         <p>
           The solver computes natural frequencies &omega; and mode shapes {&phi;} from:
-          [K]{&phi;} = &omega;&sup2;[M]{&phi;}. Mode shapes are unit-normalized ‚Äî the
+          [K]{&phi;} = &omega;&sup2;[M]{&phi;}. Mode shapes are unit-normalized ù the
           reported displacement magnitude has no physical meaning. Only the shape matters.
           Visualize each mode to identify which structural elements participate: a mode
           dominated by board flexure behaves differently under vibration than a mode
@@ -225,7 +226,7 @@
             <li>Boundary conditions for modal must match the structural installation exactly.
                 An unconstrained direction that is constrained in reality will produce an
                 artificially high frequency for modes in that direction.</li>
-            <li>Mode shape amplitude is meaningless ‚Äî only the shape and frequency matter.
+            <li>Mode shape amplitude is meaningless ù only the shape and frequency matter.
                 The amplitude is set by the normalization method, not the physical vibration.</li>
             <li>Extract enough modes to cover 1.5&times; the PSD spectrum frequency range.
                 Missing modes in the frequency range of interest produces unconservative
@@ -270,13 +271,13 @@
         <h3>Result interpretation</h3>
         <p>
           All results (stress, displacement) are reported as 1-sigma (one standard deviation)
-          values ‚Äî meaning 68.3% of the time the response will be less than that value.
+          values ù meaning 68.3% of the time the response will be less than that value.
           You can scale the result by 2 to get 2-sigma values (95.45% probability) or by 3
           to get 3-sigma values (99.73% probability) via the Scale Factor property in the
           Solution branch.<sup class="cite"><a href="#ref-1">[1]</a></sup>
         </p>
         <p>
-          Random vibration results are statistical ‚Äî they do not represent any single point in
+          Random vibration results are statistical ù they do not represent any single point in
           time. The 3-sigma stress cannot be compared to yield strength as a failure criterion
           in the same way static stress can. For qualification, compare to the fatigue allowable
           or the test-verified acceptance threshold specified in the applicable standard.
@@ -286,11 +287,11 @@
           <span class="key-points-label">Key points</span>
           <ul>
             <li>The PSD input comes from the test specification or measured environment.
-                Do not define it from engineering judgment ‚Äî use the actual spec curve.</li>
+                Do not define it from engineering judgment ù use the actual spec curve.</li>
             <li>1-sigma results must be multiplied by 3 before comparison to most qualification
                 criteria. Set the Scale Factor in Mechanical or multiply manually.</li>
             <li>Random vibration results are statistical. Present them with their sigma level
-                stated explicitly ‚Äî "3-sigma Von Mises stress = X MPa" is a complete statement;
+                stated explicitly ù "3-sigma Von Mises stress = X MPa" is a complete statement;
                 "stress = X MPa" is not.</li>
           </ul>
         </aside>
@@ -342,14 +343,14 @@
           analysis onto the structural mesh node-by-node. Where the structural and thermal
           meshes differ (separate systems), ANSYS interpolates the temperatures. Verify the
           transfer: plot temperature in the structural model before solving. An incorrect
-          transfer appears as uniform ambient temperature everywhere ‚Äî if the temperature
+          transfer appears as uniform ambient temperature everywhere ù if the temperature
           field looks constant, the link is broken.
         </p>
 
         <h3>Stress-free reference temperature</h3>
         <p>
           The structural model computes thermal expansion relative to a reference temperature
-          ‚Äî the temperature at which the assembly is stress-free. For soldered assemblies,
+          ù the temperature at which the assembly is stress-free. For soldered assemblies,
           this is approximately the reflow temperature (~260&deg;C for lead-free solder), not
           room temperature. An incorrect reference temperature produces incorrect CTE stress
           magnitude and direction.
@@ -359,13 +360,13 @@
           <span class="key-points-label">Key points</span>
           <ul>
             <li>Verify the temperature transfer before solving. A failed transfer is silent
-                ‚Äî the model solves but with uniform temperature, producing near-zero stress
+                ù the model solves but with uniform temperature, producing near-zero stress
                 that looks correct but is not.</li>
             <li>Set the stress-free reference temperature to the assembly bonding temperature,
                 not to room temperature. For soldered PCB assemblies, this is typically
                 260&deg;C (lead-free reflow).</li>
             <li>CTE mismatch between copper traces (17 ppm/&deg;C) and FR4 laminate
-                (14‚Äì18 ppm/&deg;C in-plane, 50‚Äì70 ppm/&deg;C through-thickness) is the
+                (14ù18 ppm/&deg;C in-plane, 50ù70 ppm/&deg;C through-thickness) is the
                 dominant thermal stress driver at solder joints.</li>
           </ul>
         </aside>
@@ -421,13 +422,13 @@
           converge: reduce the load step increment first (split the load into more steps).
           Do not change the material model or mesh as a first response to convergence failure.
           Convergence failure at a particular load level indicates that the material is being
-          pushed past a steep region of the stress-strain curve ‚Äî smaller steps resolve this.
+          pushed past a steep region of the stress-strain curve ù smaller steps resolve this.
         </p>
 
         <p>
           If full stress-strain data is not available: run the analysis as linear-elastic and
           compare peak Von Mises stress to yield strength. Regions above yield in the elastic
-          model will yield ‚Äî the elastic result does not give the post-yield state, but it
+          model will yield ù the elastic result does not give the post-yield state, but it
           identifies which locations require attention.
         </p>
 
@@ -435,7 +436,7 @@
           <span class="key-points-label">Key points</span>
           <ul>
             <li>When Newton-Raphson fails to converge, reduce the load step increment.
-                This is the correct first response ‚Äî not changing the material model.</li>
+                This is the correct first response ù not changing the material model.</li>
             <li>Plastic deformation requires material data past yield strength. BISO is
                 the practical choice when only yield strength and a modulus are available.</li>
             <li>Identify yielded regions by plotting equivalent plastic strain. Non-zero
@@ -492,7 +493,7 @@
               between iterations.</li>
           <li>Enable <strong>Contact Stabilization</strong> (contact pair settings): adds
               a damping term to contact that stabilizes chattering. Remove it after
-              confirming convergence ‚Äî it is not physically real.</li>
+              confirming convergence ù it is not physically real.</li>
           <li>Check pinball radius: if the gap between faces is larger than the pinball
               region, contact is never detected. Increase if surfaces are near but not
               touching.</li>
@@ -507,7 +508,7 @@
         <ul>
           <li>Enable <strong>Weak Springs</strong> (Analysis Settings &rarr; Solver Controls):
               ANSYS adds tiny springs to all unconstrained bodies to prevent rigid-body
-              motion. These springs should not carry significant reaction force ‚Äî check this
+              motion. These springs should not carry significant reaction force ù check this
               after convergence. If they do, the model is under-constrained and the springs
               are masking a setup error.</li>
           <li>Review contact definitions: a disconnected body usually has a missing bonded
@@ -531,7 +532,7 @@
         <h4>Bisection and load step control</h4>
         <p>
           When nonlinear analyses fail to converge at a substep, ANSYS automatically
-          bisects ‚Äî halves the load step and retries. The Solution Information shows
+          bisects ù halves the load step and retries. The Solution Information shows
           "Bisection occurred." This is normal for the solver to recover from difficult
           load increments. If it bisects more than 5 times in succession, the problem
           is structural: the material or contact state at that load level is genuinely
@@ -545,12 +546,12 @@
         <h3>Mesh convergence study</h3>
         <p>
           Solver convergence says the Newton-Raphson algorithm found an equilibrium. It says
-          nothing about whether that equilibrium is the correct physical answer ‚Äî which depends
+          nothing about whether that equilibrium is the correct physical answer ù which depends
           on whether the mesh is fine enough to resolve the gradient.
         </p>
         <p>
           Method: run the same analysis at two or three mesh densities. In the critical region
-          (where the peak stress or temperature is located), refine the element size by 2√ó
+          (where the peak stress or temperature is located), refine the element size by 2ù
           between each run. Extract the peak value at the same location across all runs and
           compare.
         </p>
@@ -562,7 +563,7 @@
           <li><strong>Increasing without bound as elements get smaller</strong>: mesh
               singularity. A perfectly sharp re-entrant corner (zero radius) produces
               a stress that is theoretically infinite. The finite element solution converges
-              to infinity with refinement ‚Äî this is mathematically correct but physically
+              to infinity with refinement ù this is mathematically correct but physically
               wrong. Fix: add a fillet in SpaceClaim. Real parts have a minimum radius
               determined by machining or manufacturing process. Use that radius.</li>
         </ul>
@@ -571,7 +572,7 @@
           <span class="key-points-label">Key points</span>
           <ul>
             <li>Solution Information &rarr; Force Convergence is the primary diagnostic.
-                Read it before adjusting any settings ‚Äî the convergence history shows
+                Read it before adjusting any settings ù the convergence history shows
                 which substep failed and what the residual looked like.</li>
             <li>Contact instability and rigid body motion are the two most common causes
                 of non-convergence. Check contact definitions before changing solver
@@ -606,6 +607,22 @@
         </ol>
       </section>
 
+      <aside class="hub-ref" aria-label="Ansys Learning Hub references">
+        <span class="hub-ref__label">Ansys Learning Hub ó recommended courses</span>
+        <ul class="hub-ref__list">
+          <li>
+            <a href="https://learninghub.ansys.com/learn/external-ecommerce;view=none;redirectURL=?ctldoc-catalog-0=se-Mechanical%20Beyond%20the%20Basics"
+               target="_blank" rel="noopener">Ansys Mechanical: Beyond the Basics</a>
+            <span class="hub-ref__meta">7&nbsp;hr &middot; E-learning &middot; ?5 &middot; search: "Mechanical Beyond the Basics" at learninghub.ansys.com</span>
+          </li>
+          <li>
+            <a href="https://learninghub.ansys.com/learn/external-ecommerce;view=none;redirectURL=?ctldoc-catalog-0=se-Mechanical%20Advanced%20Material%20Modeling"
+               target="_blank" rel="noopener">Ansys Mechanical Advanced Material Modeling</a>
+            <span class="hub-ref__meta">8&nbsp;hr &middot; E-learning &middot; ?5 &middot; search: "Mechanical Advanced Material Modeling" at learninghub.ansys.com</span>
+          </li>
+        </ul>
+      </aside>
+
       <nav class="phase-nav" aria-label="Phase navigation">
         <a href="../phase-3/" class="phase-nav-btn is-prev">
           <span class="nav-arrow" aria-hidden="true">&larr;</span>
@@ -632,5 +649,6 @@
   </footer>
 </body>
 </html>
+
 
 
