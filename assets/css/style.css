@@ -911,6 +911,25 @@ details > summary.example-summary:hover {
 .footer-note { color: var(--c-text-subtle); }
 
 /* --------------------------------------------------------------------------
+   Learning Hub inline hint — one line under a relevant section heading.
+   Purely secondary; should disappear visually while reading prose.
+   -------------------------------------------------------------------------- */
+.hub-inline-ref {
+  font-size: var(--t-xs);
+  color: var(--c-text-subtle);
+  margin: calc(-1 * var(--s-4)) 0 var(--s-6);
+  line-height: 1.4;
+}
+
+.hub-inline-ref a {
+  color: var(--c-text-subtle);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+}
+
+.hub-inline-ref a:hover { color: var(--c-accent); }
+
+/* --------------------------------------------------------------------------
    Learning Hub references
    Placed after phase content, before phase-nav. Visually subordinate —
    footnote weight, not a call-to-action.
