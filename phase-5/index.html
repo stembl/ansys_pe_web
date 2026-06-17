@@ -38,6 +38,7 @@
             <li><a href="#parametric-study">5.5 Parametric study</a></li>
             <li><a href="#hardware-correlation">5.6 Hardware correlation</a></li>
             <li><a href="#superposition">5.7 Superposition</a></li>
+            <li><a href="#engineering-calculator">5.8 Engineering calculations</a></li>
           </ol>
         </li>
         <li class="nav-phase"><a href="../phase-6/">6 &mdash; Maxwell</a></li>
@@ -353,6 +354,122 @@
         </aside>
       </section>
 
+
+      <section class="topic" id="engineering-calculator">
+        <h2>5.8 &nbsp;Engineering Calculations for Model Setup</h2>
+
+        <p>
+          Two hand calculations belong before every Icepak run: an estimate of the expected
+          mass flow rate through the enclosure, and a comparison of convective to radiative
+          heat flux. Both take a few minutes and prevent common setup errors that produce
+          plausible but wrong results.
+        </p>
+
+        <h3>Mass flow rate through the enclosure</h3>
+        <p>
+          The expected mass flow rate sets the scale for the thermal result. If the
+          simulation predicts temperatures that differ from this estimate by a large
+          factor, a model input is wrong before post-processing begins.
+        </p>
+        <p>
+          Volumetric flow rate at the system operating point:
+        </p>
+        <ol>
+          <li>Estimate total system pressure drop &Delta;P across the enclosure. For an
+              electronics box with reasonable vent sizing, 1&ndash;5 Pa is a typical range
+              for low-velocity forced air. Higher if vents are small or heavily louvered.</li>
+          <li>Read the fan curve at that &Delta;P to find Q (m&sup3;/s or CFM).</li>
+          <li>Correct Q to operating air temperature T<sub>in</sub>:
+              Q<sub>hot</sub> &asymp; Q<sub>25&deg;C</sub> &times; (T<sub>in</sub> + 273) / 298.
+              Air at 60&deg;C is about 10% less dense than at 25&deg;C; the fan delivers lower
+              mass flow at the same speed.</li>
+          <li>Compute mass flow rate: &ṁ; = &rho; &times; Q, where &rho; &asymp; 1.0&nbsp;kg/m&sup3;
+              at 60&deg;C. (At 25&deg;C, &rho; = 1.2&nbsp;kg/m&sup3;.)</li>
+          <li>Check average vent velocity: v = Q / A<sub>eff</sub>, where
+              A<sub>eff</sub> = physical vent area &times; free-area fraction. If v exceeds
+              5&ndash;7 m/s at a supply vent, the vent is undersized and is the dominant
+              pressure drop in the system.</li>
+        </ol>
+
+        <h3>Convection vs. radiation: when to model radiation</h3>
+        <p>
+          Icepak can include surface-to-surface radiation, but it substantially increases
+          solve time. Determine whether it is significant before turning it on.
+        </p>
+        <p>
+          At a surface at temperature T<sub>s</sub> in an enclosure at T<sub>amb</sub>:
+        </p>
+        <ul>
+          <li><strong>Radiative flux</strong>: q<sub>rad</sub> = &epsilon; &sigma;
+              (T<sub>s</sub>&sup4; &minus; T<sub>amb</sub>&sup4;), where
+              &sigma; = 5.67&times;10<sup>&minus;8</sup>&nbsp;W/m&sup2;K&sup4;</li>
+          <li><strong>Convective flux</strong>: q<sub>conv</sub> = h &times;
+              (T<sub>s</sub> &minus; T<sub>amb</sub>)</li>
+        </ul>
+
+        <p>
+          Worked example at typical conditions: T<sub>s</sub> = 80&deg;C (353&nbsp;K),
+          T<sub>amb</sub> = 25&deg;C (298&nbsp;K), &epsilon; = 0.9 (PCB or component surface):
+        </p>
+        <ul>
+          <li>q<sub>rad</sub> = 0.9 &times; 5.67&times;10<sup>&minus;8</sup>
+              &times; (353<sup>4</sup> &minus; 298<sup>4</sup>) &asymp; <strong>387&nbsp;W/m&sup2;</strong></li>
+          <li>q<sub>conv</sub>, natural convection (h&nbsp;=&nbsp;5&nbsp;W/m&sup2;K):
+              5 &times; 55 = <strong>275&nbsp;W/m&sup2;</strong></li>
+          <li>q<sub>conv</sub>, low forced convection (h&nbsp;=&nbsp;15&nbsp;W/m&sup2;K):
+              15 &times; 55 = <strong>825&nbsp;W/m&sup2;</strong></li>
+          <li>q<sub>conv</sub>, high forced convection (h&nbsp;=&nbsp;50&nbsp;W/m&sup2;K):
+              50 &times; 55 = <strong>2750&nbsp;W/m&sup2;</strong></li>
+        </ul>
+
+        <p>
+          Conclusions:
+        </p>
+        <ul>
+          <li><strong>Natural convection</strong>: radiation is larger than convection.
+              Include radiation. Neglecting it systematically underpredicts temperature.</li>
+          <li><strong>Low forced convection</strong>: radiation is ~47% of convection.
+              Still significant — include it for accurate results.</li>
+          <li><strong>High forced convection</strong>: radiation is ~14% of convection.
+              Usually negligible for engineering accuracy. Safe to omit for most models.</li>
+        </ul>
+
+        <h3>Thermal resistance pre-check</h3>
+        <p>
+          Before running Icepak, estimate the dominant conduction resistances. For a planar
+          layer (TIM, solder, PCB):
+        </p>
+        <p>
+          R<sub>&theta;</sub> = L / (k &times; A)
+        </p>
+        <p>
+          where L is thickness, k is thermal conductivity, and A is contact area. The
+          temperature drop across that layer at power P is &Delta;T = P &times; R<sub>&theta;</sub>.
+        </p>
+        <p>
+          Use this to predict where the largest temperature drops will occur and whether
+          Icepak's result is in the right ballpark. If Icepak shows a 40&deg;C drop across
+          a TIM layer but the hand calculation gives 5&deg;C, check the conductivity
+          assignment and layer thickness in the model before investigating further.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 5.8">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Estimate mass flow rate before running. If the simulation-implied flow rate
+                disagrees by more than a factor of 2 with the hand calculation, a fan curve
+                or vent free-area input is wrong.</li>
+            <li>Natural convection and lightly forced enclosures: include radiation. At
+                80&deg;C surface temperature, radiation exceeds natural convection.
+                Omitting it is a systematic error, not a conservative simplification.</li>
+            <li>High forced convection: radiation is secondary. Safe to omit and simplify
+                the solve.</li>
+            <li>Pre-calculate expected &Delta;T across each major thermal layer before
+                post-processing. Use R<sub>&theta;</sub> = L/(k&times;A) as a sanity check
+                on the simulation output.</li>
+          </ul>
+        </aside>
+      </section>
 
       <nav class="phase-nav" aria-label="Phase navigation">
         <a href="../phase-4/" class="phase-nav-btn is-prev">

@@ -34,6 +34,7 @@
             <li><a href="#mesh-methods">3.3 Mesh methods</a></li>
             <li><a href="#inflation">3.4 Inflation layers</a></li>
             <li><a href="#failure-diagnosis">3.5 Diagnosing failure</a></li>
+            <li><a href="#quality-improvement">3.6 Improving quality</a></li>
           </ol>
         </li>
         <li class="nav-phase"><a href="../phase-4/">4 &mdash; Structural &amp; Thermal</a></li>
@@ -302,6 +303,94 @@
         </aside>
       </section>
 
+
+      <section class="topic" id="quality-improvement">
+        <h2>3.6 &nbsp;Improving Poor Mesh Quality</h2>
+
+        <p>
+          Section 3.5 covers failure to generate. This section covers the other outcome:
+          the mesh generates, but quality metrics are unacceptable — high skewness, low
+          orthogonal quality, or both. The approach is different because there is a mesh
+          to inspect.
+        </p>
+
+        <h3>Step 1: locate the bad elements</h3>
+        <p>
+          The Mesh Metrics histogram (View &rarr; Mesh Metrics, select the metric)
+          shows element count vs. quality value. To find where the bad elements are:
+          left-click and drag across the worst bin in the histogram to select those elements.
+          The viewport highlights the selected elements in the geometry. This immediately
+          identifies which body or region is producing the poor quality.
+        </p>
+
+        <h3>Step 2: identify the cause</h3>
+        <p>
+          Four patterns cover most cases:
+        </p>
+        <ul>
+          <li><strong>Bad elements clustered at one body</strong>: that body has a geometric
+              problem — a sliver face, a near-tangent surface, or a gap at an interface.
+              Return to SpaceClaim.</li>
+          <li><strong>Bad elements at body interfaces</strong>: the bodies are not sharing
+              topology — contact patches are generating transition elements. Apply Share
+              topology in SpaceClaim.</li>
+          <li><strong>Bad elements spread uniformly across a body</strong>: the global element
+              size is too coarse relative to the body's curvature or a curved face is
+              producing irregular elements. Reduce element size on that body.</li>
+          <li><strong>High aspect ratio in thin features</strong>: a TIM layer, solder joint,
+              or adhesive that is much thinner than the global element size. Apply inflation
+              or Sweep meshing specifically to that body (see 3.3 and 3.4).</li>
+        </ul>
+
+        <h3>Step 3: fix in order of preference</h3>
+        <ol>
+          <li><strong>Fix the geometry in SpaceClaim</strong> (first choice): remove the
+              sliver face, close the gap, merge the coplanar faces. The mesh will improve
+              automatically on re-generation.</li>
+          <li><strong>Virtual Topology</strong> in Mechanical (Mesh &rarr; Insert &rarr;
+              Virtual Topology): merges adjacent small faces into a single logical face
+              without modifying the geometry. Effective for faces too small to fix in
+              SpaceClaim or faces that were created by the mesher itself.</li>
+          <li><strong>Pinch controls</strong> (Mesh &rarr; Insert &rarr; Pinch): collapses
+              very short edges below a threshold length before element generation.
+              Eliminates the small-edge-driven poor elements without geometry surgery.</li>
+          <li><strong>Mesh defeaturing</strong> (Mesh Details &rarr; Defeature Size): the
+              mesher ignores geometric features below this length. Use as a last resort —
+              it discards geometry information that may be relevant elsewhere.</li>
+        </ol>
+
+        <h3>When to accept poor quality</h3>
+        <p>
+          Not every poor-quality element requires action. The question is whether those
+          elements are in a path that matters to the result:
+        </p>
+        <ul>
+          <li>Poor elements at a screw boss far from the stress concentration of interest?
+              Accept them.</li>
+          <li>Poor elements at a mounting hole that carries load directly? Fix them.</li>
+          <li>High aspect ratio at a solder joint where you are computing through-thickness
+              stress? Fix it — apply Sweep meshing to that body.</li>
+          <li>High aspect ratio at a structural brace far from the area of interest?
+              Accept it if the long axis is aligned with the load direction.</li>
+        </ul>
+        <p>
+          The Mesh Metrics histogram is a tool for finding problems, not a pass/fail gate
+          on its own. A mesh with five bad elements in an unimportant region and 500,000
+          good elements everywhere else is a better mesh than a uniformly mediocre one.
+        </p>
+
+        <aside class="key-points" aria-label="Key points for 3.6">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Use the histogram to select and locate bad elements before deciding how to
+                fix them. The fix depends entirely on where they are.</li>
+            <li>The preferred fix is always SpaceClaim. Virtual Topology and Pinch are
+                workarounds when SpaceClaim repair is impractical.</li>
+            <li>A bad element only matters if it is in a region that drives the result.
+                Identify the load path first, then prioritize quality improvements accordingly.</li>
+          </ul>
+        </aside>
+      </section>
 
       <section class="references" aria-label="References">
         <h2>References</h2>

@@ -36,6 +36,7 @@
             <li><a href="#random-vibration">4.4 Random vibration</a></li>
             <li><a href="#thermal-structural">4.5 Thermal-structural</a></li>
             <li><a href="#plastic">4.6 Plastic deformation</a></li>
+            <li><a href="#solver-troubleshooting">4.7 Solver troubleshooting</a></li>
           </ol>
         </li>
         <li class="nav-phase"><a href="../phase-5/">5 &mdash; Icepak</a></li>
@@ -373,6 +374,140 @@
         </aside>
       </section>
 
+
+      <section class="topic" id="solver-troubleshooting">
+        <h2>4.7 &nbsp;Solver Non-Convergence and Solution Verification</h2>
+
+        <p>
+          Two distinct concepts are often conflated: <em>solver convergence</em> (did the
+          Newton-Raphson algorithm reach equilibrium?) and <em>mesh convergence</em>
+          (is the mesh fine enough that the result is independent of it?). Both must be
+          addressed before trusting a result.
+        </p>
+
+        <h3>Reading the convergence plot</h3>
+        <p>
+          Open Solution Information (the wrench icon under the Solution branch) and select
+          the Force Convergence tab. The plot shows the normalized force residual at each
+          iteration. A converged substep shows the residual falling monotonically below the
+          convergence criterion (default 0.5% of the reference force). Divergence looks like
+          a residual that oscillates, plateaus, or increases across iterations.
+        </p>
+        <p>
+          The residual does not need to drop to zero. It needs to drop below the criterion.
+          If the analysis terminates with "Solver failed to converge," the Solution
+          Information file shows the last-attempted substep and which Newton-Raphson iteration
+          it stalled at. Start reading there.
+        </p>
+
+        <h3>Common causes and remedies</h3>
+
+        <h4>Contact instability</h4>
+        <p>
+          The most common cause of non-convergence in assemblies. Contact status changes
+          between open and closed across iterations (chattering), preventing the global
+          stiffness from settling. Indicators: the force residual oscillates without
+          decreasing; the Solution Information shows "contact status changed" messages.
+        </p>
+        <ul>
+          <li>Set initial contact state to <strong>Adjust to Touch</strong>: eliminates
+              initial penetration that drives the first iteration into instability.</li>
+          <li>Reduce the time step: smaller substeps prevent large contact status swings
+              between iterations.</li>
+          <li>Enable <strong>Contact Stabilization</strong> (contact pair settings): adds
+              a damping term to contact that stabilizes chattering. Remove it after
+              confirming convergence — it is not physically real.</li>
+          <li>Check pinball radius: if the gap between faces is larger than the pinball
+              region, contact is never detected. Increase if surfaces are near but not
+              touching.</li>
+        </ul>
+
+        <h4>Rigid body motion</h4>
+        <p>
+          If the model has a free-floating body with no constraints or active contact, the
+          solver produces a near-zero pivot in the stiffness matrix and terminates. The
+          Solution Information shows "a Pivot check has failed" or large displacement warnings.
+        </p>
+        <ul>
+          <li>Enable <strong>Weak Springs</strong> (Analysis Settings &rarr; Solver Controls):
+              ANSYS adds tiny springs to all unconstrained bodies to prevent rigid-body
+              motion. These springs should not carry significant reaction force — check this
+              after convergence. If they do, the model is under-constrained and the springs
+              are masking a setup error.</li>
+          <li>Review contact definitions: a disconnected body usually has a missing bonded
+              contact pair. Use the Contact Tool (Connections &rarr; Contact Tool) to check
+              which pairs are open.</li>
+        </ul>
+
+        <h4>Large deformation not enabled</h4>
+        <p>
+          For problems where deflections are comparable to the part dimensions, the
+          small-strain formulation loses accuracy because it does not update the stiffness
+          matrix for the deformed geometry. Symptoms: diverges at a load level where
+          deflections are clearly large, or the result looks wrong with excessive deflections.
+        </p>
+        <p>
+          Enable: Analysis Settings &rarr; Large Deflection = On. This triggers an updated
+          Lagrangian formulation that reformulates the stiffness matrix at each substep.
+          The solve becomes slower and may require more substeps, but the physics is correct.
+        </p>
+
+        <h4>Bisection and load step control</h4>
+        <p>
+          When nonlinear analyses fail to converge at a substep, ANSYS automatically
+          bisects — halves the load step and retries. The Solution Information shows
+          "Bisection occurred." This is normal for the solver to recover from difficult
+          load increments. If it bisects more than 5 times in succession, the problem
+          is structural: the material or contact state at that load level is genuinely
+          difficult. Review the geometry and material inputs at that load level.
+        </p>
+        <p>
+          To give the solver more room to work: Analysis Settings &rarr; Number of Substeps
+          &rarr; set minimum to 10 and maximum to 200. The solver will use what it needs.
+        </p>
+
+        <h3>Mesh convergence study</h3>
+        <p>
+          Solver convergence says the Newton-Raphson algorithm found an equilibrium. It says
+          nothing about whether that equilibrium is the correct physical answer — which depends
+          on whether the mesh is fine enough to resolve the gradient.
+        </p>
+        <p>
+          Method: run the same analysis at two or three mesh densities. In the critical region
+          (where the peak stress or temperature is located), refine the element size by 2×
+          between each run. Extract the peak value at the same location across all runs and
+          compare.
+        </p>
+        <ul>
+          <li><strong>Converging result</strong>: peak value changes by less than ~5% between
+              the two finest meshes. The mesh is adequate. Report the finest-mesh result.</li>
+          <li><strong>Still changing significantly</strong>: refine further. The gradient
+              is not resolved.</li>
+          <li><strong>Increasing without bound as elements get smaller</strong>: mesh
+              singularity. A perfectly sharp re-entrant corner (zero radius) produces
+              a stress that is theoretically infinite. The finite element solution converges
+              to infinity with refinement — this is mathematically correct but physically
+              wrong. Fix: add a fillet in SpaceClaim. Real parts have a minimum radius
+              determined by machining or manufacturing process. Use that radius.</li>
+        </ul>
+
+        <aside class="key-points" aria-label="Key points for 4.7">
+          <span class="key-points-label">Key points</span>
+          <ul>
+            <li>Solution Information &rarr; Force Convergence is the primary diagnostic.
+                Read it before adjusting any settings — the convergence history shows
+                which substep failed and what the residual looked like.</li>
+            <li>Contact instability and rigid body motion are the two most common causes
+                of non-convergence. Check contact definitions before changing solver
+                settings.</li>
+            <li>Solver convergence and mesh convergence are independent. A converged
+                Newton-Raphson solution on a coarse mesh can still be wrong. Always run
+                a refinement check at the critical location.</li>
+            <li>Peak stress that increases with refinement at a perfectly sharp corner
+                is a singularity, not a real stress. Add a fillet in SpaceClaim.</li>
+          </ul>
+        </aside>
+      </section>
 
       <section class="references" aria-label="References">
         <h2>References</h2>
