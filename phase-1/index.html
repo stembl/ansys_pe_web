@@ -1,12 +1,12 @@
-ï»¿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
   <meta name="description" content="ANSYS tool landscape, Workbench project structure, and file organization for power electronics simulation.">
-  <link rel="canonical" href="https://stembl.github.io/ansys_pe_web/phase-1/">
-  <title>Phase 1: Orientation â€” FEA for Power Electronics</title>
+  <link rel="canonical" href="https://simulation.thehardwareos.com/phase-1/">
+  <title>Phase 1: Orientation — FEA for Power Electronics</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -17,6 +17,7 @@
   <header class="site-header" role="banner">
     <div class="container">
       <a href="../" class="site-logo">FEA for Power Electronics</a>
+      <a href="https://thehardwareos.com" class="site-parent-link" rel="noopener">The Hardware OS</a>
       <span class="version-pill">2025 R2</span>
     </div>
   </header>
@@ -83,7 +84,7 @@
 
           <dt>ANSYS Workbench</dt>
           <dd>
-            The integration framework. Workbench does not run analyses itself â€” it connects analysis
+            The integration framework. Workbench does not run analyses itself — it connects analysis
             systems, manages data flow between them, and tracks what needs to be updated when an input
             changes. Think of it as the project coordinator.
           </dd>
@@ -98,7 +99,7 @@
           <dt>ANSYS Icepak</dt>
           <dd>
             The thermal computational fluid dynamics (CFD) solver. Icepak computes fluid flow and heat
-            transfer simultaneously â€” it is the right tool when airflow path, flow rate, or enclosure
+            transfer simultaneously — it is the right tool when airflow path, flow rate, or enclosure
             geometry affects the thermal result.
           </dd>
 
@@ -122,7 +123,7 @@
         <aside class="key-points" aria-label="Key points for 1.1">
           <span class="key-points-label">Key points</span>
           <ul>
-            <li>Workbench connects tools â€” it does not run the analysis. Each solver opens into its
+            <li>Workbench connects tools — it does not run the analysis. Each solver opens into its
                 own environment from the Workbench schematic.</li>
             <li>SpaceClaim is upstream of everything. A geometry problem becomes a mesh problem,
                 which becomes a solver problem. Fix it at the source.</li>
@@ -138,7 +139,7 @@
 
         <p>
           The Workbench project schematic is a visual map of the analysis chain. Each block is a
-          component system. Each system contains cells â€” Geometry, Mesh, Setup, Solution, Results â€”
+          component system. Each system contains cells — Geometry, Mesh, Setup, Solution, Results —
           representing sequential steps in that analysis.
         </p>
 
@@ -150,7 +151,7 @@
         </p>
         <p>
           Sharing a mesh cell means the thermal analysis and the structural analysis use the same
-          mesh. This is efficient, but it means mesh decisions are shared â€” refining the mesh for
+          mesh. This is efficient, but it means mesh decisions are shared — refining the mesh for
           thermal accuracy also refines it for the structural analysis. Plan the mesh for the more
           demanding of the two analyses.
         </p>
@@ -161,11 +162,11 @@
           on stale results:
         </p>
         <ul>
-          <li><strong>Up to date</strong> â€” the cell's output matches its current inputs.</li>
-          <li><strong>Needs update</strong> (lightning bolt) â€” an upstream input changed; the result
+          <li><strong>Up to date</strong> — the cell's output matches its current inputs.</li>
+          <li><strong>Needs update</strong> (lightning bolt) — an upstream input changed; the result
               is not current. Do not interpret results in this state.</li>
-          <li><strong>Incomplete</strong> â€” the cell setup is not finished; the analysis cannot run.</li>
-          <li><strong>Refresh required</strong> â€” an external file (geometry, material) changed on disk.</li>
+          <li><strong>Incomplete</strong> — the cell setup is not finished; the analysis cannot run.</li>
+          <li><strong>Refresh required</strong> — an external file (geometry, material) changed on disk.</li>
         </ul>
         <p>
           Update from the top of the dependency chain, not from the bottom. Updating the Results
@@ -177,7 +178,7 @@
           <ul>
             <li>A lightning bolt on any cell means that cell's output is not current. Trace back to
                 the changed input before re-running.</li>
-            <li>Linked systems share cells â€” mesh quality decisions affect all analyses on that mesh.</li>
+            <li>Linked systems share cells — mesh quality decisions affect all analyses on that mesh.</li>
             <li>Right-click a system in the schematic &rarr; <em>Update</em> to update that system
                 and all systems it feeds.</li>
           </ul>
@@ -194,11 +195,11 @@
         </p>
         <ul>
           <li>
-            <code>ProjectName.wbpj</code> â€” the project file. Contains project metadata only.
+            <code>ProjectName.wbpj</code> — the project file. Contains project metadata only.
             Small, text-based. Opening this file without its accompanying directory opens an empty project.
           </li>
           <li>
-            <code>ProjectName_files/</code> â€” the project data directory. Contains all geometry,
+            <code>ProjectName_files/</code> — the project data directory. Contains all geometry,
             mesh, solver input files, and result files. This is what makes a project large.
           </li>
         </ul>
@@ -235,17 +236,17 @@
             <tr>
               <td><code>.aedt</code></td>
               <td>Maxwell</td>
-              <td>Complete Maxwell project â€” geometry, mesh, setup, and results. Self-contained.</td>
+              <td>Complete Maxwell project — geometry, mesh, setup, and results. Self-contained.</td>
             </tr>
             <tr>
               <td><code>.stp</code> / <code>.step</code></td>
               <td>Any (import)</td>
-              <td>STEP â€” neutral CAD format. Most reliable for import from any CAD source.</td>
+              <td>STEP — neutral CAD format. Most reliable for import from any CAD source.</td>
             </tr>
             <tr>
               <td><code>.igs</code> / <code>.iges</code></td>
               <td>Any (import)</td>
-              <td>IGES â€” older neutral format. Use STEP when available.</td>
+              <td>IGES — older neutral format. Use STEP when available.</td>
             </tr>
           </tbody>
         </table>
@@ -253,7 +254,7 @@
         <h3>Archive format</h3>
         <p>
           Workbench includes a built-in archive function: <code>File &rarr; Archive</code>.
-          This creates a <code>.wbpz</code> file â€” a compressed ZIP archive of the entire project.
+          This creates a <code>.wbpz</code> file — a compressed ZIP archive of the entire project.
         </p>
         <p>
           The archive dialog asks whether to include result files. This choice has a meaningful
@@ -268,7 +269,7 @@
             An Icepak result set for a full-enclosure CFD model is typically 500 MB to 5 GB.
           </li>
           <li>
-            A Maxwell <code>.aedt</code> result set is typically smaller â€” 50 to 500 MB â€”
+            A Maxwell <code>.aedt</code> result set is typically smaller — 50 to 500 MB —
             because the mesh is sparser than a Mechanical mesh for comparable geometry.
           </li>
         </ul>
@@ -279,7 +280,7 @@
         </p>
         <ul>
           <li>The solve takes more than 30 minutes and will not be re-run for the archive's purpose.</li>
-          <li>Archiving at a project milestone for record-keeping â€” the result is part of the record.</li>
+          <li>Archiving at a project milestone for record-keeping — the result is part of the record.</li>
           <li>Sharing with someone who cannot re-run the analysis (no license, different hardware).</li>
         </ul>
         <p>
@@ -303,7 +304,7 @@
           <ul>
             <li>Never move the <code>.wbpj</code> without the <code>_files/</code> directory.
                 They are one project.</li>
-            <li>Both <code>.wbpz</code> and <code>.aedtz</code> are standard ZIP files â€”
+            <li>Both <code>.wbpz</code> and <code>.aedtz</code> are standard ZIP files —
                 they can be inspected with any ZIP utility if the project needs to be recovered
                 manually.</li>
             <li>Name archives to indicate whether results are included:
@@ -344,5 +345,6 @@
 
 </body>
 </html>
+
 
 
