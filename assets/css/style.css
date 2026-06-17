@@ -1,5 +1,5 @@
 /* ==========================================================================
-   ANSYS for Mechanical Engineers
+   FEA for Power Electronics
    ansys_pe_web | ANSYS 2025 R2
    Design: unified surface — DEC-003
    ========================================================================== */
@@ -678,6 +678,178 @@ sup.cite {
 .nav-title { font-size: var(--t-sm); font-weight: 600; color: var(--c-text); }
 
 /* --------------------------------------------------------------------------
+   Hero — two-column layout (landing page)
+   -------------------------------------------------------------------------- */
+.hero-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-16);
+  align-items: start;
+}
+
+.hero-narrative p + p { margin-top: var(--s-4); }
+
+.hero-audience {
+  font-size: var(--t-base);
+  color: var(--c-text-subtle);
+  line-height: 1.7;
+  padding-top: var(--s-4);
+  border-top: 1px solid var(--c-border-light);
+  margin-top: var(--s-5);
+}
+
+/* Quick-access panel */
+.hero-quickaccess {
+  padding: var(--s-6);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-xl);
+  align-self: start;
+}
+
+.quickaccess-label {
+  font-size: var(--t-xs);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--c-text-muted);
+  display: block;
+  margin-bottom: var(--s-4);
+}
+
+.quickaccess-grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--s-2);
+}
+
+.quickaccess-grid a {
+  display: block;
+  padding: var(--s-3) var(--s-4);
+  background: var(--c-border-light);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r);
+  font-size: var(--t-sm);
+  font-weight: 500;
+  color: var(--c-text);
+  text-decoration: none;
+  transition: border-color 0.12s, background 0.12s;
+  line-height: 1.4;
+}
+
+.quickaccess-grid a:hover {
+  border-color: var(--c-accent);
+  background: var(--c-accent-dim);
+  color: var(--c-accent-hover);
+}
+
+/* Phase cards — prerequisite note */
+.card-prereq {
+  font-size: var(--t-xs);
+  color: var(--c-text-subtle);
+  margin-top: auto;
+  padding-top: var(--s-3);
+}
+
+/* --------------------------------------------------------------------------
+   Collapsible examples
+   -------------------------------------------------------------------------- */
+.example-block {
+  margin-top: var(--s-8);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+}
+
+.example-block summary {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-4) var(--s-6);
+  cursor: pointer;
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--c-text-muted);
+  background: var(--c-border-light);
+  list-style: none;
+  user-select: none;
+  transition: background 0.12s;
+}
+
+.example-block summary::-webkit-details-marker { display: none; }
+
+.example-block summary::before {
+  content: '▶';
+  font-size: 0.65em;
+  color: var(--c-accent);
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+
+details[open] > .example-block summary::before,
+.example-block[open] > summary::before {
+  transform: rotate(90deg);
+}
+
+details[open] > summary.example-block,
+details > .example-block summary {
+  /* handled by parent details element */
+}
+
+details > summary.example-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--s-3);
+  padding: var(--s-4) var(--s-6);
+  cursor: pointer;
+  font-size: var(--t-sm);
+  font-weight: 600;
+  color: var(--c-text-muted);
+  background: var(--c-border-light);
+  list-style: none;
+  user-select: none;
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  margin-top: var(--s-8);
+  transition: background 0.12s, border-color 0.12s;
+}
+
+details > summary.example-summary::-webkit-details-marker { display: none; }
+
+details > summary.example-summary::before {
+  content: '▶';
+  font-size: 0.65em;
+  color: var(--c-accent);
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+
+details[open] > summary.example-summary::before {
+  transform: rotate(90deg);
+}
+
+details > summary.example-summary:hover {
+  border-color: var(--c-text-muted);
+  background: var(--c-bg);
+}
+
+.example-content {
+  padding: var(--s-6);
+  border: 1px solid var(--c-border);
+  border-top: none;
+  border-radius: 0 0 var(--r-lg) var(--r-lg);
+}
+
+.example-content p { margin-bottom: var(--s-4); line-height: 1.75; color: var(--c-text); }
+.example-content ol, .example-content ul {
+  margin: var(--s-3) 0 var(--s-5) var(--s-6);
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-2);
+}
+.example-content li { line-height: 1.65; color: var(--c-text); }
+
+/* --------------------------------------------------------------------------
    Footer
    -------------------------------------------------------------------------- */
 .site-footer {
@@ -696,11 +868,21 @@ sup.cite {
   gap: var(--s-3);
 }
 
+.footer-license { color: var(--c-text-muted); }
+.footer-license a { color: var(--c-text-muted); text-underline-offset: 2px; }
+.footer-license a:hover { color: var(--c-accent); }
+.footer-note { color: var(--c-text-subtle); }
+
 /* --------------------------------------------------------------------------
    Responsive
    -------------------------------------------------------------------------- */
 @media (min-width: 600px) {
   .curriculum-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 780px) {
+  .hero-layout { grid-template-columns: 1fr; gap: var(--s-8); }
+  .quickaccess-grid { grid-template-columns: 1fr 1fr; }
 }
 
 @media (max-width: 860px) {

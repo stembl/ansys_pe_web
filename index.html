@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="color-scheme" content="light dark">
-  <meta name="description" content="ANSYS simulation training for mechanical engineers working on power electronics products. SpaceClaim, Workbench, Mechanical, Icepak, and Maxwell.">
+  <meta name="description" content="Practical FEA and CFD simulation workflows for engineers working on power electronics hardware. Structural, thermal, and electromagnetic analysis with worked examples.">
   <link rel="canonical" href="https://stembl.github.io/ansys_pe_web/">
-  <title>ANSYS for Mechanical Engineers</title>
+  <title>FEA for Power Electronics — Simulation Training</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -16,19 +16,40 @@
 
   <header class="site-header" role="banner">
     <div class="container">
-      <a href="." class="site-logo">ANSYS Training</a>
-      <span class="version-pill">2025 R2</span>
+      <a href="." class="site-logo">FEA for Power Electronics</a>
     </div>
   </header>
 
   <section class="hero" aria-labelledby="hero-heading">
-    <div class="container">
-      <h1 id="hero-heading">ANSYS for Mechanical<br>Engineers</h1>
-      <p class="hero-description">
-        Simulation training for mechanical engineers working on power electronics products.
-        SpaceClaim, Workbench, Mechanical, Icepak, and Maxwell — from geometry preparation
-        through coupled multi-physics analysis.
-      </p>
+    <div class="container hero-layout">
+
+      <div class="hero-narrative">
+        <h1 id="hero-heading">Simulation for Power&nbsp;Electronics Engineers</h1>
+        <p class="hero-description">
+          Practical workflows for structural, thermal, and electromagnetic analysis of
+          power electronics hardware — heatsinks, PCBs, enclosures, busbars, and
+          transformers. All examples are worked in ANSYS. The approach applies to any
+          FEA or CFD tool.
+        </p>
+        <p class="hero-audience">
+          For engineers who already understand power electronics and need to build
+          simulation capability. No prior FEA experience assumed. Start at Phase&nbsp;1
+          or jump to the analysis type you need.
+        </p>
+      </div>
+
+      <div class="hero-quickaccess" aria-label="Jump to simulation type">
+        <span class="quickaccess-label">Jump to simulation type</span>
+        <ul class="quickaccess-grid">
+          <li><a href="phase-4/#static-setup">Structural &amp; Vibration</a></li>
+          <li><a href="phase-5/">Thermal CFD</a></li>
+          <li><a href="phase-6/">Electromagnetics</a></li>
+          <li><a href="phase-3/">Meshing</a></li>
+          <li><a href="phase-2/">Geometry Prep</a></li>
+          <li><a href="phase-7/">Multi-Physics</a></li>
+        </ul>
+      </div>
+
     </div>
   </section>
 
@@ -36,11 +57,12 @@
     <div class="container">
 
       <header class="sect-header">
-        <span class="sect-label">Phases</span>
-        <h2>From geometry to multi-physics</h2>
+        <span class="sect-label">Seven phases</span>
+        <h2>Start at Phase 1 or reference any phase independently</h2>
         <p>
-          Each phase builds on the last. Geometry preparation is the foundation —
-          every analysis downstream depends on getting it right.
+          Phases build in sequence — geometry first, then meshing, then analysis.
+          Each section also stands alone as a reference when you need one specific
+          technique mid-project.
         </p>
       </header>
 
@@ -50,32 +72,35 @@
           <span class="card-section-label" aria-label="Phase 1">Phase 01</span>
           <h3>Orientation</h3>
           <p>
-            The ANSYS product family, how Workbench connects analysis tools, and how to
-            keep project files organized — including the archive format and when to save
-            results versus setup only.
+            The simulation tool landscape, how a project manager connects analysis
+            tools, and how to keep files organized — including the archive format
+            and when to save results versus setup only.
           </p>
           <ul class="card-tags" aria-label="Topics">
-            <li class="tag">Product landscape</li>
-            <li class="tag">Workbench</li>
+            <li class="tag">Tool landscape</li>
+            <li class="tag">Project structure</li>
             <li class="tag">File types</li>
-            <li class="tag">Project archive</li>
+            <li class="tag">Archiving</li>
           </ul>
+          <p class="card-prereq">Start here — no prerequisites</p>
           <a href="phase-1/" class="card-cta">Open phase &rarr;</a>
         </li>
 
         <li class="curriculum-card">
           <span class="card-section-label" aria-label="Phase 2">Phase 02</span>
-          <h3>SpaceClaim Model Preparation</h3>
+          <h3>Geometry Preparation</h3>
           <p>
             CAD import, identifying mesh-hostile geometry, defeaturing for structural,
-            thermal, and electromagnetic analyses, and shared topology for bonded contact.
+            thermal, and electromagnetic analyses. Geometry repair and shared topology
+            at part interfaces.
           </p>
           <ul class="card-tags" aria-label="Topics">
             <li class="tag">CAD import</li>
             <li class="tag">Defeaturing</li>
             <li class="tag">Fluid volumes</li>
-            <li class="tag">Shared topology</li>
+            <li class="tag">Topology sharing</li>
           </ul>
+          <p class="card-prereq">Prerequisite: Phase 1</p>
           <a href="phase-2/" class="card-cta">Open phase &rarr;</a>
         </li>
 
@@ -83,15 +108,17 @@
           <span class="card-section-label" aria-label="Phase 3">Phase 03</span>
           <h3>Meshing</h3>
           <p>
-            Mesh quality metrics, sizing strategy, mesh methods, inflation layers,
-            and the iterative cycle between mesh failure and geometry repair.
+            Quality metrics and targets, global vs. local sizing strategy, mesh methods,
+            inflation layers. Diagnosing failure and improving poor quality — including
+            the feedback loop between mesh metrics and geometry repair.
           </p>
           <ul class="card-tags" aria-label="Topics">
             <li class="tag">Quality metrics</li>
             <li class="tag">Sizing strategy</li>
-            <li class="tag">Inflation</li>
-            <li class="tag">Failure recovery</li>
+            <li class="tag">Mesh methods</li>
+            <li class="tag">Troubleshooting</li>
           </ul>
+          <p class="card-prereq">Prerequisite: Phase 2</p>
           <a href="phase-3/" class="card-cta">Open phase &rarr;</a>
         </li>
 
@@ -99,40 +126,45 @@
           <span class="card-section-label" aria-label="Phase 4">Phase 04</span>
           <h3>Structural and Thermal Analyses</h3>
           <p>
-            Static structural, modal analysis and random vibration, steady-state thermal
-            with CTE-driven stress, and plastic deformation with nonlinear material models.
+            Static structural, modal and random vibration, steady-state thermal with
+            CTE-driven stress, plastic deformation, and solver troubleshooting.
+            Includes mesh convergence study method.
           </p>
           <ul class="card-tags" aria-label="Topics">
-            <li class="tag">Static structural</li>
+            <li class="tag">Static stress</li>
             <li class="tag">Modal &amp; RSD</li>
-            <li class="tag">Thermal-structural</li>
-            <li class="tag">Plastic deformation</li>
+            <li class="tag">Thermal coupling</li>
+            <li class="tag">Solver convergence</li>
           </ul>
+          <p class="card-prereq">Prerequisite: Phase 3</p>
           <a href="phase-4/" class="card-cta">Open phase &rarr;</a>
         </li>
 
         <li class="curriculum-card">
           <span class="card-section-label" aria-label="Phase 5">Phase 05</span>
-          <h3>Icepak</h3>
+          <h3>Thermal CFD</h3>
           <p>
-            Thermal CFD for electronics: building models, airflow and fans, compact thermal
-            models, parametric heatsink studies, and correlating results to hardware measurements.
+            Conjugate heat transfer for electronics cooling: model construction, compact
+            thermal models, forced convection, parametric heatsink studies, hardware
+            correlation, superposition, and pre-analysis engineering calculations.
           </p>
           <ul class="card-tags" aria-label="Topics">
-            <li class="tag">CFD</li>
+            <li class="tag">Conjugate HT</li>
             <li class="tag">Compact models</li>
-            <li class="tag">Parametric study</li>
+            <li class="tag">Fan optimization</li>
             <li class="tag">Hardware correlation</li>
           </ul>
+          <p class="card-prereq">Prerequisite: Phase 3; Phase 4 helpful</p>
           <a href="phase-5/" class="card-cta">Open phase &rarr;</a>
         </li>
 
         <li class="curriculum-card">
           <span class="card-section-label" aria-label="Phase 6">Phase 06</span>
-          <h3>Maxwell</h3>
+          <h3>Electromagnetic Analysis</h3>
           <p>
-            Electromagnetic analysis: DC conduction and joule heating, eddy current losses,
-            transformer winding and core losses, and exporting loss maps for thermal analysis.
+            DC conduction and joule heating, eddy current losses at frequency, magnetostatic
+            inductance, transformer winding and core losses, adaptive meshing, and
+            exporting loss maps to thermal analysis.
           </p>
           <ul class="card-tags" aria-label="Topics">
             <li class="tag">DC conduction</li>
@@ -140,21 +172,24 @@
             <li class="tag">Transformer losses</li>
             <li class="tag">Loss export</li>
           </ul>
+          <p class="card-prereq">Prerequisite: Phase 3</p>
           <a href="phase-6/" class="card-cta">Open phase &rarr;</a>
         </li>
 
         <li class="curriculum-card">
           <span class="card-section-label" aria-label="Phase 7">Phase 07</span>
-          <h3>Multi-Physics and Closing</h3>
+          <h3>Multi-Physics and Results</h3>
           <p>
-            Linking Maxwell and Icepak in Workbench, tracing a design change through the
-            full analysis chain, and communicating simulation results at a design review.
+            Linking electromagnetic and thermal analyses, tracing a design change through
+            the full analysis chain, and communicating simulation results at a design
+            review. When results are trustworthy and how to say so clearly.
           </p>
           <ul class="card-tags" aria-label="Topics">
-            <li class="tag">Workbench linking</li>
-            <li class="tag">Design change</li>
-            <li class="tag">Result communication</li>
+            <li class="tag">Coupled analysis</li>
+            <li class="tag">Design iteration</li>
+            <li class="tag">Result reporting</li>
           </ul>
+          <p class="card-prereq">Recommended: Phases 4–6 first</p>
           <a href="phase-7/" class="card-cta">Open phase &rarr;</a>
         </li>
 
@@ -165,9 +200,34 @@
 
   <footer class="site-footer" role="contentinfo">
     <div class="container">
-      <span>ANSYS for Mechanical Engineers</span>
-      <span>ANSYS 2025 R2 &nbsp;&middot;&nbsp; Internal use</span>
+      <span class="footer-license">
+        &copy; 2026 Steve Embleton &nbsp;&middot;&nbsp;
+        <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" rel="noopener" title="Creative Commons Attribution-NonCommercial-ShareAlike 4.0">CC BY-NC-SA 4.0</a>
+      </span>
+      <span class="footer-note">Examples use ANSYS 2025 R2</span>
     </div>
+    <!--
+    ===========================================================================
+    BOOK_HOOK — Uncomment to add book advertisement in footer
+    ===========================================================================
+    <div class="container" style="padding-top:0; border-top: 1px solid var(--c-border-light); margin-top: 0;">
+      <p style="font-size:0.875rem; color: var(--c-text-muted);">
+        Going deeper? See the companion book: <a href="#">[BOOK TITLE — TBD]</a>
+      </p>
+    </div>
+    ===========================================================================
+    -->
+    <!--
+    ===========================================================================
+    COMPANY_HOOK — Uncomment to add company / consulting services link
+    ===========================================================================
+    <div class="container" style="padding-top:0;">
+      <p style="font-size:0.875rem; color: var(--c-text-muted);">
+        Need expert support? <a href="#">[COMPANY NAME — TBD] — simulation consulting for power electronics</a>
+      </p>
+    </div>
+    ===========================================================================
+    -->
   </footer>
 
 </body>
