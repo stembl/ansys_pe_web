@@ -807,14 +807,20 @@ sup.cite {
 
 .example-block summary::before {
   content: '+';
-  font-size: 1em;
+  font-size: var(--t-sm);
   font-weight: 700;
   line-height: 1;
   color: var(--c-accent);
-  transition: none;
+  background: var(--c-accent-dim);
+  border: 1.5px solid var(--c-accent);
+  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  width: 1em;
-  text-align: center;
+  transition: background 0.12s;
 }
 
 details[open] > .example-block summary::before,
@@ -850,14 +856,20 @@ details > summary.example-summary::-webkit-details-marker { display: none; }
 
 details > summary.example-summary::before {
   content: '+';
-  font-size: 1em;
+  font-size: var(--t-sm);
   font-weight: 700;
   line-height: 1;
   color: var(--c-accent);
-  transition: none;
+  background: var(--c-accent-dim);
+  border: 1.5px solid var(--c-accent);
+  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
-  width: 1em;
-  text-align: center;
+  transition: background 0.12s;
 }
 
 details[open] > summary.example-summary::before {
@@ -866,8 +878,14 @@ details[open] > summary.example-summary::before {
 }
 
 details > summary.example-summary:hover {
-  border-color: var(--c-text-muted);
+  border-color: var(--c-accent);
   background: var(--c-bg);
+}
+
+details > summary.example-summary:hover::before,
+.example-block summary:hover::before {
+  background: var(--c-accent);
+  color: var(--c-bg);
 }
 
 .example-content {
