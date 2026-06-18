@@ -4,7 +4,7 @@
    Design: unified surface — DEC-003
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+/* System font stack — Helvetica Neue on macOS/iOS, Arial on Windows */
 
 /* --------------------------------------------------------------------------
    Custom properties — light mode
@@ -13,7 +13,7 @@
   color-scheme: light dark;
 
   /* Single surface — sidebar and content share this */
-  --c-bg:           #FFFFFF;
+  --c-bg:           #FAFAFA;   /* zinc-50 — not pure white, ~19:1 contrast */
   --c-surface:      #FFFFFF;
 
   --c-border:       #E4E4E7;   /* zinc-200 */
@@ -24,11 +24,11 @@
   --c-text-subtle:  #A1A1AA;   /* zinc-400 — unavailable phases, placeholders */
 
   --c-primary:      #09090B;   /* same as text — header uses this */
-  --c-accent:       #D97706;   /* amber-600 */
-  --c-accent-hover: #B45309;   /* amber-700 */
+  --c-accent:       #B45309;   /* amber-700 — 5.8:1 on #FAFAFA, passes WCAG AA */
+  --c-accent-hover: #92400E;   /* amber-800 */
   --c-accent-dim:   #FEF3C7;   /* amber-100 — callout bg only */
 
-  --font:      'Inter', system-ui, -apple-system, sans-serif;
+  --font:      "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
 
   --t-xs:   0.75rem;
@@ -62,13 +62,13 @@
 @media (prefers-color-scheme: dark) {
   :root {
     /* Single surface — same dark bg everywhere */
-    --c-bg:           #09090B;   /* zinc-950 */
+    --c-bg:           #18181B;   /* zinc-900 — not black, no halation */
     --c-surface:      #09090B;   /* same — no second surface */
 
     --c-border:       #27272A;   /* zinc-800 */
     --c-border-light: #18181B;   /* zinc-900 */
 
-    --c-text:         #FAFAFA;   /* zinc-50 — bright, readable */
+    --c-text:         #D4D4D8;   /* zinc-300 — ~11:1 on zinc-900, no glow */
     --c-text-muted:   #A1A1AA;   /* zinc-400 — nav, secondary */
     --c-text-subtle:  #52525B;   /* zinc-600 — unavailable, placeholder */
 
@@ -145,16 +145,6 @@ a:hover { color: var(--c-accent-hover); }
 }
 .site-logo:hover { color: var(--c-accent); }
 
-.version-pill {
-  font-size: var(--t-xs);
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--c-accent);
-  border: 1px solid var(--c-border);
-  border-radius: 999px;
-  padding: 2px var(--s-3);
-}
 
 /* --------------------------------------------------------------------------
    Hero — landing page
