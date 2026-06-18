@@ -4,7 +4,7 @@
    Design: unified surface — DEC-003
    ========================================================================== */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+/* System font stack — Helvetica Neue on macOS/iOS, Arial on Windows */
 
 /* --------------------------------------------------------------------------
    Custom properties — light mode
@@ -28,7 +28,7 @@
   --c-accent-hover: #B45309;   /* amber-700 */
   --c-accent-dim:   #FEF3C7;   /* amber-100 — callout bg only */
 
-  --font:      'Inter', system-ui, -apple-system, sans-serif;
+  --font:      "Helvetica Neue", Helvetica, Arial, sans-serif;
   --font-mono: 'Cascadia Code', 'Fira Code', 'Consolas', monospace;
 
   --t-xs:   0.75rem;
